@@ -6,8 +6,8 @@
       <Version>1.0.0</Version>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
-      <Resource Name="csvgen.PKG"/>
-      <UnitTest Name="/src" Package="UnitTests" Phase="test"/>
+      <Resource Name="evshvarov.PKG"/>
+      <UnitTest Name="/Tests" Package="UnitTests" Phase="test"/>
     </Module>
     
   </Document>

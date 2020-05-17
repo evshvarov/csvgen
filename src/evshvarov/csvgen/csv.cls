@@ -1,22 +1,19 @@
 Class evshvarov.csvgen.csv
 {
 
-ClassMethod Run() As %Status
-{
-    set fn="/irisdev/app/data/covid-03-16-2020.csv"
-    set status=##class(csvgen.csv).Generate(fn,",",.pclass,,.rc)
-    Write "class="_pclass,!
-    Write "record Count="_rc
-}
-
-/// generates class for arbitrary CSV
+/// generates class for an arbitrary CSV. All the properties are VARCHAR 250
+/// fncsv - csv file on disk
+/// dlm - delimeter
+/// pclass - class name, if not passed, then will be generated and returned by ref
+/// importData - 1, if you want data be loaded into the generated class 
+/// recordCount - amount of records created and returned byRef
 ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, importData As %Boolean = 1, ByRef recordCount As %Integer) As %Status
 {
-    if $g(pclass)="" set pclass="csvgen.generated."_$TR($E(fncsv,1,5),"/.","")_$zd($h,8)
+    if $g(pclass)="" set pclass="evshvarov.csvgen.generated."_$TR($E(fncsv,1,5),"/.","")_($zd($h,8))
     set rowtype=..GetRowTypes(fncsv,dlm)
     do ##class(%SQL.Util.Procedures).CSVTOCLASS(, rowtype, fncsv,",", ,1, pclass)
     //ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]
-    if importData d $ClassMethod(pclass,"Import",,fncsv,dlm,,1,,.recordCount)
+    if importData d $ClassMethod(pclass,"Import",,fncsv,dlm,,1,.recordCount)
     q $$$OK
 }
 
