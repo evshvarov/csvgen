@@ -7,8 +7,6 @@ XData setup
   <Default Name="SourceDir" Value="#{$system.Process.CurrentDirectory()}src"/>
   <Default Name="Namespace" Value="IRISAPP"/>
   <Default Name="app" Value="irisapp" />
-  <Default Name="restapp" Value="/rest-test" />
-
   <Namespace Name="${Namespace}" Code="${Namespace}" Data="${Namespace}" Create="yes" Ensemble="no">
 
     <Configuration>
@@ -16,27 +14,9 @@ XData setup
 
       <Import File="${SourceDir}" Flags="ck" Recurse="1"/>
     </Configuration>
-    <CSPApplication Url="/csp/${app}" 
-      Directory="${cspdir}${app}" 
-      ServeFiles="1"
-      Recurse="1" 
-      Grant="%DB_${Namespace},%SQL"
-      AuthenticationMethods="32"
-       
-    />
-    <CSPApplication Url="${restapp}"
-      Recurse="1"
-      Directory="${cspdir}${restapp}" 
-      Grant="%DB_${Namespace},%SQL"
-      AuthenticationMethods="96"
-      />
-
+   
   </Namespace>
-    <Invoke Class="App.Installer" Method="SetDispatchClass">
-    <Arg Value="${restapp}"/>
-    <Arg Value="community.objectscript.RESTExample"/>
-  </Invoke>
-
+  
 
 </Manifest>
 }
