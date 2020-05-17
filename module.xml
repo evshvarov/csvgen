@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+  <Document name="objectscript-package-example.ZPM">
+    <Module>
+      <Name>objectscript-package-example</Name>
+      <Version>1.0.0</Version>
+      <Packaging>module</Packaging>
+      <SourcesRoot>src</SourcesRoot>
+      <Resource Name="community.objectscript.PKG"/>
+      <Resource Name="community.objectscript.settings.GBL"/>
+      <UnitTest Name="/src" Package="UnitTests" Phase="test"/>
+      <Invokes>
+        <Invoke Class="community.objectscript.PersistentClass" Method="CreateRecord"></Invoke>
+        <Invoke Class="community.objectscript.ClassExample" Method="SetToTheGlobal">
+          <Arg>42</Arg>
+          <Arg>Text Data</Arg>
+        </Invoke>
+      </Invokes>
+      <CSPApplication
+        Url="/hello"
+        SourcePath="/src/csp"
+        DeployPath="${cspdir}hello"
+        ServeFiles="1"
+        Recurse="1"
+        CookiePath="/hello"
+        UseCookies="2"
+        MatchRoles=":${dbrole}"
+        PasswordAuthEnabled="1"
+        UnauthenticatedEnabled="0"
+       />
+
+       <CSPApplication 
+        Url="/rest-test"
+        SourcePath="/src/csp"
+        Recurse="1"
+        DeployPath="${cspdir}rest-test" 
+        MatchRoles=":${dbrole}"
+        PasswordAuthEnabled="1"
+        UnauthenticatedEnabled="0"
+        DispatchClass="community.objectscript.RESTExample"
+        ServeFiles="1"
+        CookiePath="/rest-test"
+        UseCookies="2"
+       />
+    </Module>
+    
+  </Document>
+</Export>

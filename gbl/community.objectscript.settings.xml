@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="IRIS" version="26" zv="IRIS for UNIX (Ubuntu Server LTS for x86-64 Containers) 2019.3 (Build 309U)" ts="2019-11-14 18:06:20">
+<Global>
+<Node><Sub>^community.objectscript.settings</Sub>
+<Node><Sub>Mode</Sub>
+<Data>Package Manager</Data>
+</Node>
+<Node><Sub>Parameter</Sub>
+<Data>42</Data>
+</Node>
+</Node>
+</Global>
+</Export>
