@@ -5,6 +5,12 @@
       <Name>csvgen</Name>
       <Version>1.0.0</Version>
       <Packaging>module</Packaging>
+      <Dependencies>
+        <ModuleReference>
+          <Name>sslclient</Name>
+          <Version>1.0.1</Version>
+        </ModuleReference>
+      </Dependencies>
       <SourcesRoot>src</SourcesRoot>
       <Resource Name="evshvarov.PKG"/>
       <UnitTest Name="/Tests" Package="UnitTests" Phase="test"/>
