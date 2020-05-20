@@ -1,6 +1,13 @@
 Class evshvarov.csvgen
 {
 
+ClassMethod HowManyRecords(ByRef recordsCount As %Integer) As %Status
+{
+    set classname="csvgen_generated.usr20200519"
+    &sql(SELECT Count(1) INTO :recordsCount FROM csvgen_generated.usr20200519)
+      IF SQLCODE<0 {WRITE "SQLCODE error ",SQLCODE," ",%msg  QUIT}
+}
+
 ClassMethod Run() As %Status
 {
     set url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/05-17-2020.csv"
