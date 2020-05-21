@@ -13,13 +13,14 @@ ClassMethod Run() As %Status
     set url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/05-17-2020.csv"
 	set status=##class(evshvarov.csvgen).GenerateFromURL(url,",",,1,.tResults)
     Write tResults
+    return status
 }
 
-ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", pclass As %String, importData As %Boolean, ByRef recordCount As %Integer) As %Status
+ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", pclass As %String, importData As %Boolean = 1, ByRef recordCount As %Integer) As %Status
 {
     s stream=..GetStreamFromURL(URL)
     s sc=..StreamToFile(stream,.filename)
-    s sc=..Generate(filename,dlm,.pclass,1,.recordCount)  
+    s sc=..Generate(filename,dlm,.pclass,importData,.recordCount)  
     return sc
 }
 
