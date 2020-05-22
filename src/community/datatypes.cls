@@ -1,4 +1,4 @@
-Class evshvarov.datatypes
+Class community.datatypes
 {
 
 ClassMethod Decide(ByRef types) As %String

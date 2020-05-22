@@ -12,7 +12,7 @@ zpm:USER>install csvgen
 ### Generate and import from CSV file
 
 ```
-USER>do ##class(evshvarov.csvgen).Generate("/folder/filename.csv")
+USER>do ##class(community.csvgen).Generate("/folder/filename.csv")
 ```
 
 This will parse csv with "," as delimeter, generate class "csvgen.filenameYYYYMMDD" and import the data from file
@@ -23,7 +23,7 @@ With parameters to the Generate method you can alter delimeter, classname and ge
 ### Generate and import from URL
 
 ```
-USER>do ##classs(evshvarov.csvgen).GenerateFromURL("example.com/data/filename.csv")
+USER>do ##classs(community.csvgen).GenerateFromURL("example.com/data/filename.csv")
 ```
 
 This will do the same as above with the same parameters, but from URL in the Internet, which is publicly avaliable.

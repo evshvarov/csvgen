@@ -12,7 +12,7 @@
         </ModuleReference>
       </Dependencies>
       <SourcesRoot>src</SourcesRoot>
-      <Resource Name="evshvarov.PKG"/>
+      <Resource Name="community.PKG"/>
       <UnitTest Name="/Tests" Package="UnitTests" Phase="test"/>
     </Module>
     

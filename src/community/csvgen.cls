@@ -1,4 +1,4 @@
-Class evshvarov.csvgen
+Class community.csvgen
 {
 
 ClassMethod HowManyRecords(ByRef recordsCount As %Integer) As %Status
@@ -11,7 +11,7 @@ ClassMethod HowManyRecords(ByRef recordsCount As %Integer) As %Status
 ClassMethod Run() As %Status
 {
     set url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/05-17-2020.csv"
-	set status=##class(evshvarov.csvgen).GenerateFromURL(url,",",,1,.tResults)
+	set status=##class(community.csvgen).GenerateFromURL(url,",",,1,.tResults)
     Write tResults
     return status
 }
