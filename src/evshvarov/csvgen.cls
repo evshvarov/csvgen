@@ -5,7 +5,8 @@ ClassMethod HowManyRecords(ByRef recordsCount As %Integer) As %Status
 {
     set classname="csvgen_generated.usr20200519"
     &sql(SELECT Count(1) INTO :recordsCount FROM csvgen_generated.usr20200519)
-      IF SQLCODE<0 {WRITE "SQLCODE error ",SQLCODE," ",%msg  QUIT}
+      IF SQLCODE<0 {WRITE "SQLCODE error ",SQLCODE," ",%msg}
+    Quit $$$OK
 }
 
 ClassMethod Run() As %Status
