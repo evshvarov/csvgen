@@ -3,6 +3,9 @@ Class community.datatypes
 
 ClassMethod Decide(ByRef types) As %String
 {
+    If $D(types("MONEY")),$D(types("DOUBLE")) {
+        if types("MONEY")=types("DOUBLE") return "MONEY"
+    }
     set i=$Order(types(""))
     while i'="" {
         set typesI(types(i))=i
@@ -21,7 +24,7 @@ ClassMethod Guess(value As %String, ByRef types) As %Status
 {
    if $IsvalidDouble(value) {
        if $I(types("DOUBLE"))
-       if $L(value,".")>1,$L($P(value,".",2))<5 if $I(types("NUMERIC"))
+       if $L(value,".")>1,$L($P(value,".",2))<5 if $I(types("MONEY"))
        if ($L(value,".")=1) if $I(types("INTEGER"))
    quit $$$OK
    }

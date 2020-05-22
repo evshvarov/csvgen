@@ -42,7 +42,7 @@ Method TestNumeric()
 	Set tExpected=1
     set value=20.1231
     w ##class(community.datatypes).Guess(value,.types)
-    set tResults=$D(types("NUMERIC"))
+    set tResults=$D(types("MONEY"))
 	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
 }
 
