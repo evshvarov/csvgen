@@ -33,7 +33,7 @@ ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", pclass As %Str
 ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, importData As %Boolean = 1, ByRef recordCount As %Integer) As %Status
 {
     if $g(pclass)="" set pclass="csvgen.generated."_$TR($E(fncsv,1,5),"/.","")_($zd($h,8))
-    set rowtype=..GetRowTypes(fncsv,dlm)
+    set rowtype=..GetRowTypes(fncsv,dlm,1)
     do ##class(%SQL.Util.Procedures).CSVTOCLASS(, rowtype, fncsv,",", ,1, pclass)
     //ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]
     if importData d $ClassMethod(pclass,"Import",,fncsv,dlm,,1,.recordCount)
@@ -41,13 +41,43 @@ ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %St
 }
 
 /// returns the string in format: "FieldName1 VARCHAR(250), FieldName2 VARCHAR(250)"
-ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",") As %String
+/// if guessTypes=1 tries to guess the type upon the value taking first n rows
+/// deep - how many rows to take for analysis
+ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",", guessTypes As %Boolean = 0, deep As %Integer = 5) As %String
 {
+    set rowtypes=""
     set stream=..GetStreamFromFile(fncsv)
-    set line=stream.ReadLine()
-    for i=1:1:$Length(line,dlm) {
-        set $Piece(rowtypes,dlm,i)=$TR($Piece(line,dlm,i)," ","")_" VARCHAR(250)"
-     }
+    if 'guessTypes {
+        set line=stream.ReadLine()
+
+        for i=1:1:$Length(line,dlm) {
+            set $Piece(rowtypes,dlm,i)=$TR($Piece(line,dlm,i)," ","")_" VARCHAR(250)"
+        }
+    }
+    if guessTypes {
+        set header=stream.ReadLine() // header
+        // load test lines
+        for r=1:1:deep{
+            if stream.AtEnd quit
+            set line(r)=stream.ReadLine()
+        }
+        
+        for i=1:1:($Length(header,dlm)-1) {
+            kill types
+            for r=1:1:deep {
+                do ##class(datatypes).Guess($Piece(line(r),dlm,i),.types)
+                }
+            set type=##class(datatypes).Decide(.types) 
+            //if type="DATE" set type ="VARCHAR"
+            if type="VARCHAR" set type="VARCHAR(250)"
+            set $Piece(rowtypes,dlm,i)=$TR($Piece(header,dlm,i)," ","")_" "_type
+
+        }
+        
+
+    }
+
+    
     Return rowtypes
 }
 
