@@ -21,7 +21,7 @@ ClassMethod HowManyRecords(pclass As %String, ByRef recordsCount As %Integer) As
 ClassMethod RunURL() As %Status
 {
     set url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/05-17-2020.csv"
-	set status=##class(community.csvgen).GenerateFromURL(url,",",,1,.tResults)
+	set status=##class(community.csvgen).GenerateFromURL(url,",",1,.tResults)
     Write tResults
     return status
 }
@@ -29,29 +29,30 @@ ClassMethod RunURL() As %Status
 ClassMethod Run() As %Status
 {
 	set fn="/irisdev/app/data/covid-03-16-2020.csv"
-	set status=##class(community.csvgen).Generate(fn,",",,.tResults)
+	set status=##class(community.csvgen).Generate(fn,",",1,,.tResults)
     return status
 }
 
-ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", pclass As %String, ByRef recordCount As %Integer) As %Status
+ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", pguessTypes As %Boolean = 1, ByRef pclass As %String, Output recordsCount As %Integer) As %Status
 {
     s stream=..GetStreamFromURL(URL)
     s sc=..StreamToFile(stream,.filename)
-    s sc=..Generate(filename,dlm,.pclass,.recordCount)  
+    s sc=..Generate(filename,dlm,pguessTypes,.pclass,.recordsCount)  
     return sc
 }
 
 /// generates class for an arbitrary CSV. All the properties are VARCHAR 250
 /// fncsv - csv file on disk
 /// dlm - delimeter
+/// pguessTypes - flag to try to guess on datatypes
 /// pclass - class name, if not passed, then will be generated and returned by ref
 /// importData - 1, if you want data be loaded into the generated class 
 /// recordCount - amount of records created and returned byRef
-ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, Output recordsCount As %Integer) As %Status
+ClassMethod Generate(fncsv As %String, dlm As %String = ",", pguessTypes As %Boolean = 1, ByRef pclass As %String, Output recordsCount As %Integer) As %Status
 {
     set sc=$$$OK
     if $g(pclass)="" set pclass="community.csvgen.generated."_$TR($E(fncsv,1,5),"/.","")_($zd($h,8))
-    set rowtype=..GetRowTypes(fncsv,dlm,1)
+    set rowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
     do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, rowtype, fncsv,",", ,1, pclass)
     set sc=..HowManyRecords(pclass,.recordsCount)
     //ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]

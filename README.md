@@ -16,7 +16,8 @@ USER>do ##class(community.csvgen).Generate("/folder/filename.csv")
 ```
 
 This will parse csv with "," as delimeter, generate class "csvgen.filenameYYYYMMDD" and import the data from file
-ALL the propeties are of %String (MAXLEN=250).
+It tries to "guess" the datatype upon the data in first 4 rows.
+pass the 3-rd parameter as 0 if you want all the datatypes be as "%String MAXLEN=250"
 The class will have Import method to make more imports from the file with the same structure.
 With parameters to the Generate method you can alter delimeter, classname and get the number of imported records.
 
