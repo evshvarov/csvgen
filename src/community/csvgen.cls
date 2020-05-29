@@ -29,6 +29,7 @@ ClassMethod RunURL() As %Status
 ClassMethod Run() As %Status
 {
 	set fn="/irisdev/app/data/covid-03-16-2020.csv"
+    set fn="/irisdev/app/data/game_of_thrones_deaths_collecti.csv"
 	set status=##class(community.csvgen).Generate(fn,",",1,,.tResults)
     return status
 }
@@ -63,7 +64,7 @@ ClassMethod Generate(fncsv As %String, dlm As %String = ",", pguessTypes As %Boo
 /// returns the string in format: "FieldName1 VARCHAR(250), FieldName2 VARCHAR(250)"
 /// if guessTypes=1 tries to guess the type upon the value taking first n rows
 /// deep - how many rows to take for analysis
-ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",", guessTypes As %Boolean = 0, deep As %Integer = 4) As %String
+ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",", guessTypes As %Boolean = 0, deep As %Integer = 5) As %String
 {
     set rowtypes=""
     set stream=..GetStreamFromFile(fncsv)
@@ -80,6 +81,7 @@ ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",", guessTypes As %B
         for r=1:1:deep{
             if stream.AtEnd quit
             set line(r)=stream.ReadLine()
+            set line(r)=..RemoveDlm(line(r),dlm)
         }
         
         for i=1:1:($Length(header,dlm)) {
@@ -99,6 +101,19 @@ ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",", guessTypes As %B
 
     
     Return rowtypes
+}
+
+/// remove all occurences of dlm inside quoutes
+ClassMethod RemoveDlm(str As %String, dlm As %String = ",") As %String
+{
+    //s str="1,0,3,""Braund, Mr. Owen Harris"",male,22,1,0,A/5 21171,7.25,,S"
+    //s str="29,1,3,""O'Dwyer, Miss. Ellen ""Nellie"""",female,,0,0,330959,7.8792,,Q"
+    set quote=""""
+    While $L(str,quote)>1 {
+        set $P(str,quote,2)=$Tr($P(str,quote,2),dlm)
+        set str=$P(str,quote,1)_$P(str,quote,2)_$p(str,quote,3,*)
+    }
+    return str
 }
 
 ClassMethod GetStreamFromFile(fn As %String) As %Stream

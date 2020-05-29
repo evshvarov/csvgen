@@ -24,7 +24,7 @@ ClassMethod Guess(value As %String, ByRef types) As %Status
 {
    if $IsvalidDouble(value) {
        if $I(types("DOUBLE"))
-       if $L(value,".")>1,$L($P(value,".",2))<5 if $I(types("MONEY"))
+       if $L(value,".")>1,$L($P(value,".",2))<10 if $I(types("MONEY"))
        if ($L(value,".")=1) if $I(types("INTEGER"))
    quit $$$OK
    }
