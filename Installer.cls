@@ -12,7 +12,7 @@ XData setup
     <Configuration>
       <Database Name="${Namespace}" Dir="/opt/${app}/data" Create="yes" Resource="%DB_${Namespace}"/>
 
-      <Import File="${SourceDir}" Flags="ck" Recurse="1"/>
+    <Import File="${SourceDir}" Flags="ck" Recurse="1"/>
     </Configuration>
    
   </Namespace>

@@ -21,24 +21,29 @@ ClassMethod HowManyRecords(pclass As %String, ByRef recordsCount As %Integer) As
 ClassMethod RunURL() As %Status
 {
     set url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/05-17-2020.csv"
-	set status=##class(community.csvgen).GenerateFromURL(url,",",1,.tResults)
-    Write tResults
+	kill pclass
+ kill prowtype
+    set status=##class(community.csvgen).GenerateFromURL(url,",",.pclass,.prowtype,1,.tResults)
     return status
 }
 
 ClassMethod Run() As %Status
 {
-	set fn="/irisdev/app/data/covid-03-16-2020.csv"
-    set fn="/irisdev/app/data/game_of_thrones_deaths_collecti.csv"
-	set status=##class(community.csvgen).Generate(fn,",",1,,.tResults)
+	set fn="/irisdev/app/data/game_of_thrones_deaths_collecti.csv"
+  set fn="/irisdev/app/data/covid-03-16-2020.csv"
+    kill pclass
+    kill prowtype
+	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults)
     return status
 }
 
-ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", pguessTypes As %Boolean = 1, ByRef pclass As %String, Output recordsCount As %Integer) As %Status
+ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, verbose As %Boolean = 1) As %Status
 {
     s stream=..GetStreamFromURL(URL)
     s sc=..StreamToFile(stream,.filename)
-    s sc=..Generate(filename,dlm,pguessTypes,.pclass,.recordsCount)  
+    if $$$ISERR(sc) Return sc
+    s sc=..Generate(filename,dlm,.pclass,.prowtype,pguessTypes,.recordsCount,verbose) 
+    
     return sc
 }
 
@@ -49,13 +54,19 @@ ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", pguessTypes As
 /// pclass - class name, if not passed, then will be generated and returned by ref
 /// importData - 1, if you want data be loaded into the generated class 
 /// recordCount - amount of records created and returned byRef
-ClassMethod Generate(fncsv As %String, dlm As %String = ",", pguessTypes As %Boolean = 1, ByRef pclass As %String, Output recordsCount As %Integer) As %Status
+ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, ByRef rowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, verbose As %Boolean = 1) As %Status
 {
     set sc=$$$OK
     if $g(pclass)="" set pclass="community.csvgen.generated."_$TR($E(fncsv,1,5),"/.","")_($zd($h,8))
-    set rowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
-    do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, rowtype, fncsv,",", ,1, pclass)
+    if $g(prowtype)="" set prowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
+    do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv,",", ,1, pclass)
     set sc=..HowManyRecords(pclass,.recordsCount)
+    if verbose {
+        Write !
+        Write "Class name: "_pclass,!
+        Write "Header: "_prowtype,!
+        Write "Records imported: "_recordsCount
+    }
     //ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]
     //if importData d $ClassMethod(pclass,"Import",1,fncsv,dlm,,1,.recordCount)
     q sc

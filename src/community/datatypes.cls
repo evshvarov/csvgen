@@ -7,7 +7,7 @@ ClassMethod Decide(ByRef types) As %String
         if types("MONEY")=types("DOUBLE") return "MONEY"
     }
     set i=$Order(types(""))
-    while i'="" {
+    while i'="" { 
         set typesI(types(i))=i
         set i=$Order(types(i))
     }
