@@ -54,7 +54,7 @@ ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass A
 /// pclass - class name, if not passed, then will be generated and returned by ref
 /// importData - 1, if you want data be loaded into the generated class 
 /// recordCount - amount of records created and returned byRef
-ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, ByRef rowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, verbose As %Boolean = 1) As %Status
+ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, verbose As %Boolean = 1) As %Status
 {
     set sc=$$$OK
     if $g(pclass)="" set pclass="community.csvgen.generated."_$TR($E(fncsv,1,5),"/.","")_($zd($h,8))
