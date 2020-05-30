@@ -30,6 +30,14 @@ USER>do ##classs(community.csvgen).GenerateFromURL("example.com/data/filename.cs
 This will do the same as above with the same parameters, but from URL in the Internet, which is publicly avaliable.
 it will use SSL connection, with "default" SSL, but you can alter this.
 
+### Additional parameters:
+- dlm - delimiter symbol for the file, "," by default.
+- ByRef pclass - classname if you want to setup the name. If omitted will be generated in a package csvgen.
+- ByRef prowtype - rowtypes in CSV2CLASS format, e.g. FIELD1 VARCHAR(250), FIELD2 INTEGER,.... If omitted, will be generated upon the header of CSV.
+- pguessTypes - guess on field types. 1 by default. if 0 then all fields will be as VARCHAR 250
+- Output recordsCount - returns amount of imported records.
+- verbose 1 by default - outputs the results of class generation and data import.
+
 
 ## COLLABORATION
 
