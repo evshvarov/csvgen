@@ -54,7 +54,7 @@ ClassMethod Generate(fncsv As %String, dlm As %String = ",", pguessTypes As %Boo
     set sc=$$$OK
     if $g(pclass)="" set pclass="community.csvgen.generated."_$TR($E(fncsv,1,5),"/.","")_($zd($h,8))
     set rowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
-    do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, rowtype, fncsv,",", ,1, pclass)
+    do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, rowtype, fncsv, dlm, ,1, pclass)
     set sc=..HowManyRecords(pclass,.recordsCount)
     //ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]
     //if importData d $ClassMethod(pclass,"Import",1,fncsv,dlm,,1,.recordCount)
