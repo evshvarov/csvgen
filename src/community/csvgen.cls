@@ -59,7 +59,7 @@ ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %St
     set sc=$$$OK
     if $g(pclass)="" set pclass="community.csvgen.generated."_$TR($E(fncsv,1,5),"/.","")_($zd($h,8))
     if $g(prowtype)="" set prowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
-    do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv,",", ,1, pclass)
+    do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv, dlm, ,1, pclass)
     set sc=..HowManyRecords(pclass,.recordsCount)
     if verbose {
         Write !
