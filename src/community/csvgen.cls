@@ -30,10 +30,12 @@ ClassMethod RunURL() As %Status
 ClassMethod Run() As %Status
 {
 	set fn="/irisdev/app/data/game_of_thrones_deaths_collecti.csv"
-  set fn="/irisdev/app/data/covid-03-16-2020.csv"
+    set fn="/irisdev/app/data/covid-03-16-2020.csv"
+    set fn="/irisdev/app/data/organisations.csv"
     kill pclass
+    set pclass="data.organs"
     kill prowtype
-	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults)
+	set status=##class(community.csvgen).Generate(fn,";",.pclass,.prowtype,1,.tResults)
     return status
 }
 
@@ -110,7 +112,7 @@ ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",", guessTypes As %B
 
     }
 
-    
+    set rowtypes=$TR(rowtypes,dlm,",")
     Return rowtypes
 }
 
