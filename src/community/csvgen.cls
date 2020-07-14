@@ -33,9 +33,8 @@ ClassMethod Run() As %Status
     set fn="/irisdev/app/data/covid-03-16-2020.csv"
     set fn="/irisdev/app/data/organisations.csv"
     kill pclass
-    set pclass="data.organs"
     kill prowtype
-	set status=##class(community.csvgen).Generate(fn,";",.pclass,.prowtype,1,.tResults)
+  	set status=##class(community.csvgen).Generate(fn,,.pclass,.prowtype,1,.tResults)
     return status
 }
 
@@ -63,6 +62,7 @@ ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %St
     if $g(prowtype)="" set prowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
     do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv, dlm, ,1, pclass)
     set sc=..HowManyRecords(pclass,.recordsCount)
+    if $$$ISERR(sc) q sc
     if verbose {
         Write !
         Write "Class name: "_pclass,!
@@ -92,7 +92,7 @@ ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",", guessTypes As %B
         set header=stream.ReadLine() // header
         // load test lines
         for r=1:1:deep{
-            if stream.AtEnd quit
+            if stream.AtEnd set deep=r-1 quit
             set line(r)=stream.ReadLine()
             set line(r)=..RemoveDlm(line(r),dlm)
         }
