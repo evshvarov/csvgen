@@ -71,6 +71,11 @@ Records imported: 167
 USER>d ##class(community.csvgen).GenerateFromURL("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/05-29-2020.csv",",","Data.Covid19")
 ```
 
+## Known Issues
+Doesn't work if column name contains dots, e.g. column.name
+
+
+
 ## COLLABORATION
 
 Collaboration to this util is very welcome! 
