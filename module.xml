@@ -3,7 +3,7 @@
   <Document name="csvgen.ZPM">
     <Module>
       <Name>csvgen</Name>
-      <Version>1.1.6</Version>
+      <Version>1.1.7</Version>
       <Packaging>module</Packaging>
       <Dependencies>
         <ModuleReference>
