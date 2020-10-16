@@ -3,7 +3,8 @@
   <Document name="csvgen.ZPM">
     <Module>
       <Name>csvgen</Name>
-      <Version>1.1.8</Version>
+      <Version>1.1.9</Version>
+      <Description>Module to generate and import csv data using InterSystems ObjectScript</Description>
       <Packaging>module</Packaging>
       <Dependencies>
         <ModuleReference>
