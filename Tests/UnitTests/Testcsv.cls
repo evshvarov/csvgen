@@ -1,13 +1,24 @@
 Class UnitTests.Testcsv Extends %UnitTest.TestCase
 {
 
+Method TestDotsinCols()
+{
+	Set tExpected=272
+	set fn="/irisdev/app/data/10k_diabetes_small 2.csv"
+	kill pclass
+    kill prowtype
+	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults)
+	do $$$AssertStatusOK(status,"Generate")
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+}
+
 Method TestGenerate()
 {
 	Set tExpected=272
 	set fn="/irisdev/app/data/covid-03-16-2020.csv"
 	kill pclass
     kill prowtype
-	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults)
+	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,0,.tResults)
 	do $$$AssertStatusOK(status,"Generate")
 	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
 }
