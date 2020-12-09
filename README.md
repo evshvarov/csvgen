@@ -24,7 +24,7 @@ With parameters to the Generate method you can alter delimeter, classname and ge
 ### Generate and import from URL
 
 ```
-USER>do ##classs(community.csvgen).GenerateFromURL("example.com/data/filename.csv")
+USER>do ##class(community.csvgen).GenerateFromURL("example.com/data/filename.csv")
 ```
 
 This will do the same as above with the same parameters, but from URL in the Internet, which is publicly avaliable.
@@ -51,7 +51,7 @@ Records imported: 891
 USER>
 ```
 ### Import COVID19 data
-[Data Source](https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_daily_reports/05-29-2020.csv")
+[Data Source](https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_daily_reports/05-29-2020.csv)
 ```
 USER>d ##class(community.csvgen).GenerateFromURL("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/05-29-2020.csv",",","Data.Covid19")
 
