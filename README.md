@@ -43,7 +43,7 @@ it will use SSL connection, with "default" SSL, but you can alter this.
 ### Import Titanic data
 [Data Source](https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv)
 ```
-USER>d ##class(community.csvgen).GenerateFromURL("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv",",","Data.Titanic)
+USER>d ##class(community.csvgen).GenerateFromURL("https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv",",","Data.Titanic")
 
 Class name: Data.Titanic
 Header: PassengerId INTEGER,Survived INTEGER,Pclass INTEGER,Name VARCHAR(250),Sex VARCHAR(250),Age INTEGER,SibSp INTEGER,Parch INTEGER,Ticket VARCHAR(250),Fare MONEY,Cabin VARCHAR(250),Embarked VARCHAR(250)
