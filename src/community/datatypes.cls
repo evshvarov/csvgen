@@ -41,7 +41,7 @@ ClassMethod IsDate(pVar As %String = "") As %Boolean
 {
     set result=$$$YES
     Try {
-        Set test = $ZDateH(pVar,5)
+        If $ZDateH(pVar,5)
     }
     Catch e {
         set result=$$$NO
