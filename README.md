@@ -1,5 +1,7 @@
-# csvgen
-This is not very clever but working util to generate class and import data from an arbitrary CSV.
+## csvgen
+[![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/csvgen)
+
+This is a simple to to import data from an arbitrary CSV to InterSystems IRIS.
 It can import from file or from public URL
 
 ## Installation with ZPM
