@@ -3,13 +3,13 @@
   <Document name="csvgen.ZPM">
     <Module>
       <Name>csvgen</Name>
-      <Version>1.1.11</Version>
+      <Version>1.1.12</Version>
       <Description>Module to generate and import csv data using InterSystems ObjectScript</Description>
       <Packaging>module</Packaging>
       <Dependencies>
         <ModuleReference>
           <Name>sslclient</Name>
-          <Version>1.0.1</Version>
+          <Version>1.*</Version>
         </ModuleReference>
       </Dependencies>
       <SourcesRoot>src</SourcesRoot>

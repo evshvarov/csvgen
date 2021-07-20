@@ -1,12 +1,12 @@
-; run installer to create namespace
-do $SYSTEM.OBJ.Load("/opt/irisapp/Installer.cls", "ck")
-set sc = ##class(App.Installer).setup() 
-
-zn "IRISAPP"
-do $System.OBJ.LoadDir("/opt/irisapp/src","ck",,1)
-
+// Unexpire passwords for dev mode
 zn "%SYS"
 Do ##class(Security.Users).UnExpireUserPasswords("*")
 
-; call your initial methods here
+// create IRISAPP namespace
+do $SYSTEM.OBJ.Load("/opt/irisbuild/Installer.cls", "ck") 
+set sc = ##class(App.Installer).setup() 
+
+
+zn "IRISAPP"
+zpm "load /opt/irisbuild/ -v":1:1
 halt
