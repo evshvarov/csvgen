@@ -54,12 +54,12 @@ ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass A
 /// dlm - delimeter
 /// pguessTypes - flag to try to guess on datatypes
 /// pclass - class name, if not passed, then will be generated and returned by ref
-/// importData - 1, if you want data be loaded into the generated class 
 /// recordCount - amount of records created and returned byRef
+/// verbose=1 - 1 if you want utility to comment to terminal what is going on
 ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, verbose As %Boolean = 1) As %Status
 {
     set sc=$$$OK
-    if $g(pclass)="" set pclass="community.csvgen.generated."_$TR($E(fncsv,1,5),"\/.","")_($zd($h,8))
+    if $g(pclass)="" set pclass="community.csvgen.generated."_$TR($E(fncsv,1,5),":\/.","")_($zd($h,8))
     if $g(prowtype)="" set prowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
     do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv, dlm, ,1, pclass)
     If %sqlcontext.%SQLCODE && (%sqlcontext.%SQLCODE '= 100) Quit $$$ERROR($$$SQLCode, %sqlcontext.%SQLCODE, %sqlcontext.%Message)
