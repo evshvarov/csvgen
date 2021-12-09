@@ -1,5 +1,8 @@
 ## csvgen
+
 [![Gitter](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/csvgen)
+ [![Quality Gate Status](https://community.objectscriptquality.com/api/project_badges/measure?project=intersystems_iris_community%2Fcsvgen&metric=alert_status)](https://community.objectscriptquality.com/dashboard?id=intersystems_iris_community%2Fcsvgen)
+ <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/evshvarov/csvgen">
 
 This is a simple to to import data from an arbitrary CSV to InterSystems IRIS.
 It can import from file or from public URL
