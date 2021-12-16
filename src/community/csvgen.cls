@@ -18,6 +18,31 @@ ClassMethod HowManyRecords(pclass As %String, ByRef recordsCount As %Integer) As
     q tSC
 }
 
+/// adds pAppend parameter to a generated Import method of a pClassName and the logic around
+ClassMethod AddAppendtoImport(pClassName As %String) As %Status
+{
+ 
+    set method = ##class(%Dictionary.MethodDefinition).%OpenId(pClassName_"||Import")
+
+    if method.FormalSpec["pAppend" quit $$$OK
+    set method.FormalSpec=method.FormalSpec_",pAppend:%Boolean=0"
+    set imp=method.Implementation
+    set newImp=##class(%Stream.TmpCharacter).%New()
+
+    while 'imp.AtEnd {
+        set line=imp.ReadLine() 
+        if line'["%DeleteExtent" {do newImp.WriteLine(line)}
+        else {
+            do newImp.WriteLine($p(line,"do")_"if 'pAppend do ..%DeleteExtent(,.tDeleted,.tInstances,1)")
+        }
+        }
+    set method.Implementation=newImp
+    set sc=method.%Save() 
+    if $$$ISERR(sc) return sc
+    set sc=$System.OBJ.Compile(pClassName,"cuk")
+    return sc
+}
+
 ClassMethod RunURL() As %Status
 {
     set url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/05-17-2020.csv"
@@ -29,22 +54,23 @@ ClassMethod RunURL() As %Status
 
 ClassMethod Run() As %Status
 {
-	set fn="/irisdev/app/data/game_of_thrones_deaths_collecti.csv"
-    set fn="/irisdev/app/data/covid-03-16-2020.csv"
-    set fn="/irisdev/app/data/organisations.csv"
-    set fn="/irisdev/app/data/10k_diabetes_small 2.csv"
+	set fn="/irisrun/repo/data/game_of_thrones_deaths_collecti.csv"
+    set fn="/irisrun/repo/data/covid-03-16-2020.csv"
+    set fn="/irisrun/repo/data/organisations.csv"
+    set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
     kill pclass
     kill prowtype
   	set status=##class(community.csvgen).Generate(fn,,.pclass,.prowtype,0,.tResults)
+    set status=##class(community.csvgen).Generate(fn,,.pclass,.prowtype,0,.tResults,,1)  
     return status
 }
 
-ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, verbose As %Boolean = 1) As %Status
+ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, pverbose As %Boolean = 1, pappend As %Boolean = 0) As %Status
 {
-    s stream=..GetStreamFromURL(URL)
+    s stream=..GetStreamFromURL(URL) 
     s sc=..StreamToFile(stream,.filename)
     if $$$ISERR(sc) Return sc
-    s sc=..Generate(filename,dlm,.pclass,.prowtype,pguessTypes,.recordsCount,verbose) 
+    s sc=..Generate(filename,dlm,.pclass,.prowtype,pguessTypes,.recordsCount,pverbose,pappend) 
     
     return sc
 }
@@ -55,22 +81,33 @@ ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass A
 /// pguessTypes - flag to try to guess on datatypes
 /// pclass - class name, if not passed, then will be generated and returned by ref
 /// recordCount - amount of records created and returned byRef
-/// verbose=1 - 1 if you want utility to comment to terminal what is going on
-ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, verbose As %Boolean = 1) As %Status
+/// pverbose=1 - 1 if you want utility to comment to terminal what is going on
+/// pappend=0 - 1 if you want to add records to already existing
+ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, pverbose As %Boolean = 1, pappend As %Boolean = 0) As %Status
 {
     set sc=$$$OK
     if $g(pclass)="" set pclass="community.csvgen.generated."_$TR($E(fncsv,1,5),":\/.","")_($zd($h,8))
-    if $g(prowtype)="" set prowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
-    do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv, dlm, ,1, pclass)
+    if $g(pappend),##class(%Dictionary.CompiledClass).%ExistsId(pclass) {
+        ///ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]
+        set pRecordCount=$CLASSMETHOD(pclass,"Import",,fncsv,dlm,,1,,pappend)
+        }
+    else {
+        if $g(prowtype)="" set prowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
+        do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv, dlm, ,1, pclass)
+        // change the generated method to add the Append support
+        set sc=..AddAppendtoImport(pclass)
+        if $$$ISERR(sc) q sc
+    }
     If %sqlcontext.%SQLCODE && (%sqlcontext.%SQLCODE '= 100) Quit $$$ERROR($$$SQLCode, %sqlcontext.%SQLCODE, %sqlcontext.%Message)
     set sc=..HowManyRecords(pclass,.recordsCount)
     if $$$ISERR(sc) q sc
-    if verbose {
+    if pverbose {
         Write !
         Write "Class name: "_pclass,!
         Write "Header: "_prowtype,!
         Write "Records imported: "_recordsCount
     }
+    
     //ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]
     //if importData d $ClassMethod(pclass,"Import",1,fncsv,dlm,,1,.recordCount)
     q sc
