@@ -1,13 +1,47 @@
 Class UnitTests.Testcsv Extends %UnitTest.TestCase
 {
 
-Method TestDotsinCols()
+Method NoHeader()
+{
+	Set tExpected=10
+	set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
+	kill pclass
+    kill prowtype
+	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults,,,1,0)
+	do $$$AssertStatusOK(status,"Generate")
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+}
+
+Method NoLoadData()
 {
 	Set tExpected=9
 	set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
 	kill pclass
     kill prowtype
+	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults,,,0)
+	do $$$AssertStatusOK(status,"Generate")
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+}
+
+Method TestAppend()
+{
+	Set tExpected=18
+	set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
+	kill pclass
+    kill prowtype
 	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults)
+	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults,1,1)
+	do $$$AssertStatusOK(status,"Generate")
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+}
+
+Method TestDotsinCols()
+{
+	Set tExpected=809
+	set fn="/irisrun/repo/data/organisations.csv"
+	kill pclass
+    kill prowtype
+	set status=##class(community.csvgen).Generate(fn,";",.pclass,.prowtype,1,.tResults)
 	do $$$AssertStatusOK(status,"Generate")
 	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
 }
@@ -28,7 +62,7 @@ Method TestWithRowtype()
 	Set tExpected=272
 	set fn="/irisrun/repo/data/covid-03-16-2020.csv"
 	kill pclass
-	set prowtype="Province/State VARCHAR(250),Country/Region VARCHAR(250),LastUpdate DATE,Confirmed INTEGER,Deaths INTEGER,Recovered INTEGER,Latitude MONEY,Longitude MONEY"
+	set prowtype="ProvinceState VARCHAR(250),CountryRegion VARCHAR(250),LastUpdate DATE,Confirmed INTEGER,Deaths INTEGER,Recovered INTEGER,Latitude MONEY,Longitude MONEY"
 	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults)
 	do $$$AssertStatusOK(status,"Generate")
 	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)

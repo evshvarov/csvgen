@@ -46,26 +46,31 @@ ClassMethod AddAppendtoImport(pClassName As %String) As %Status
 ClassMethod RunURL() As %Status
 {
     set url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/05-17-2020.csv"
-	kill pclass
+	set url="https://raw.githubusercontent.com/zauberware/postal-codes-json-xml-csv/master/data/AT/zipcodes.at.csv"
+    set url="https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.csv"
+    kill pclass
  kill prowtype
-    set status=##class(community.csvgen).GenerateFromURL(url,",",.pclass,.prowtype,1,.tResults)
+    set status=##class(community.csvgen).GenerateFromURL(url,",",.pclass,.prowtype,0,.tResults)
     return status
 }
 
 ClassMethod Run() As %Status
 {
-	set fn="/irisrun/repo/data/game_of_thrones_deaths_collecti.csv"
+    set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
+    set fn="/irisrun/repo/data/game_of_thrones_deaths_collecti_with_bad.csv"
+    set fn="/irisrun/repo/data/countries_dspl.csv"
     set fn="/irisrun/repo/data/covid-03-16-2020.csv"
     set fn="/irisrun/repo/data/organisations.csv"
-    set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
-    kill pclass
+    //set fn="/irisrun/repo/data/game_of_thrones_deaths_collecti.csv"
+    
+    kill pclass 
     kill prowtype
-  	set status=##class(community.csvgen).Generate(fn,,.pclass,.prowtype,0,.tResults)
-    set status=##class(community.csvgen).Generate(fn,,.pclass,.prowtype,0,.tResults,,1)  
+  	set status=##class(community.csvgen).Generate(fn,";",.pclass,.prowtype,0,.tResults)
+    //set status=##class(community.csvgen).Generate(fn,,.pclass,.prowtype,0,.tResults,,1)  
     return status
 }
 
-ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, pverbose As %Boolean = 1, pappend As %Boolean = 0) As %Status
+ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, pverbose As %Boolean = 1, pappend As %Boolean = 0, ploaddata As %Boolean = 1, pheader As %Boolean = 1) As %Status
 {
     s stream=..GetStreamFromURL(URL) 
     s sc=..StreamToFile(stream,.filename)
@@ -83,22 +88,49 @@ ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass A
 /// recordCount - amount of records created and returned byRef
 /// pverbose=1 - 1 if you want utility to comment to terminal what is going on
 /// pappend=0 - 1 if you want to add records to already existing
-ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, pverbose As %Boolean = 1, pappend As %Boolean = 0) As %Status
+/// ploaddata=1 - use LOAD DATA if it is avaliable 
+/// pheader=1 - if equals 1 import skips the 1st row that is considered as header
+ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, pverbose As %Boolean = 1, pappend As %Boolean = 0, ploaddata As %Boolean = 1, pheader As %Boolean = 1) As %Status
 {
+    if ploaddata {
+        // ploaddata only available in IRIS from 2021.2 and newer
+        if ($System.Version.GetNumber()<2021.2) set ploaddata=0
+        }
+    
     set sc=$$$OK
-    if $g(pclass)="" set pclass="community.csvgen.generated."_$TR($E(fncsv,1,5),":\/.","")_($zd($h,8))
+    if $g(pclass)="" set pclass=..RandomClassName(fncsv)       //"community.csvgen.generated."_$TR($E(fncsv,1,5),":\/.","")_($zd($h,8))
+    If '$System.OBJ.IsValidClassname(pclass) {
+        Quit $$$ERROR($$$GeneralError, "ClassName is not valid") 
+        }
+    if '$g(pappend),##class(%Dictionary.CompiledClass).%ExistsId(pclass){
+        do $CLASSMETHOD(pclass,"%DeleteExtent")
+        
+    } 
+
     if $g(pappend),##class(%Dictionary.CompiledClass).%ExistsId(pclass) {
-        ///ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]
-        set pRecordCount=$CLASSMETHOD(pclass,"Import",,fncsv,dlm,,1,,pappend)
+        
+        if ploaddata {
+            set sc=..CSVLOADDATA(prowtype,fncsv,dlm,pclass,$g(pappend))
+            set sc=..HowManyRecords(pclass,.recordsCount)
+        }
+        else {
+            ///ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]  
+            set pRecordCount=$CLASSMETHOD(pclass,"Import",,fncsv,dlm,,1,,pappend)
+            }
         }
     else {
+
         if $g(prowtype)="" set prowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
-        do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv, dlm, ,1, pclass)
-        // change the generated method to add the Append support
-        set sc=..AddAppendtoImport(pclass)
-        if $$$ISERR(sc) q sc
+        if $g(ploaddata) {
+            set sc=..CSVLOADDATA(prowtype,fncsv,dlm,pclass,$g(pappend),$g(pheader))}
+        else {
+            do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv, dlm, ,1, pclass)
+            // change the generated method to add the Append support
+            set sc=..AddAppendtoImport(pclass)
+            if $$$ISERR(sc) q sc
+            If %sqlcontext.%SQLCODE && (%sqlcontext.%SQLCODE '= 100) Quit $$$ERROR($$$SQLCode, %sqlcontext.%SQLCODE, %sqlcontext.%Message)
+        }
     }
-    If %sqlcontext.%SQLCODE && (%sqlcontext.%SQLCODE '= 100) Quit $$$ERROR($$$SQLCode, %sqlcontext.%SQLCODE, %sqlcontext.%Message)
     set sc=..HowManyRecords(pclass,.recordsCount)
     if $$$ISERR(sc) q sc
     if pverbose {
@@ -113,6 +145,45 @@ ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %St
     q sc
 }
 
+/// Random class name
+ClassMethod RandomClassName(fncsv) As %String
+{
+    Set rclassname="community.csvgen.generated."_$TR($E(fncsv,1,5),":\/.","")_($zd($h,8))_$R(9)
+    while ##class(%Dictionary.CompiledClass).%ExistsId(rclassname) {
+        set rclassname=rclassname_$R(9)
+    }
+    Return rclassname
+}
+
+/// CSVLOADDATA - generates and imports data into the class
+ClassMethod CSVLOADDATA(prowtype, fncsv, dlm, pclass, pappend, pheader) As %Status
+{
+    Set sc = $$$OK
+    set tablename=$TR($P(pclass,".",1,*-1),".","_")_"."_$p(pclass,".",*)
+
+
+    If '##class(%Dictionary.ClassDefinition).%ExistsId(pclass) {
+
+    set sql="CREATE TABLE "_tablename_"("_prowtype_")"
+    set tStatement = ##class(%SQL.Statement).%New()
+    set sc = tStatement.%Prepare(sql)
+    if sc'=1 return sc
+    SET rset = tStatement.%Execute()
+    }
+    //if 'pappend do $CLASSMETHOD(pclass,"%DeleteExtent")
+    set importsql="LOAD DATA FROM FILE '"_fncsv_"'"
+    set importsql=importsql_" COLUMNS("_prowtype_") INTO "_tablename
+    set importsql=importsql_" USING {""from"":{""file"":{""columnseparator"":"""_dlm_""""
+    if $g(pheader) set importsql=importsql_",""header"":""1"""
+    set importsql=importsql_"}}}"
+    set tStatement = ##class(%SQL.Statement).%New()
+    set sc = tStatement.%Prepare(importsql)
+    if sc'=1 return sc
+    SET rset = tStatement.%Execute()
+
+    Return sc
+}
+
 /// returns the string in format: "FieldName1 VARCHAR(250), FieldName2 VARCHAR(250)"
 /// if guessTypes=1 tries to guess the type upon the value taking first n rows
 /// deep - how many rows to take for analysis
@@ -124,7 +195,7 @@ ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",", guessTypes As %B
         set line=stream.ReadLine()
 
         for i=1:1:$Length(line,dlm) {
-            set $Piece(rowtypes,dlm,i)=$TR($Piece(line,dlm,i)," ","")_" VARCHAR(250)"
+            set $Piece(rowtypes,dlm,i)=$TR($Piece(line,dlm,i),"/ ","")_" VARCHAR(250)"
         }
     }
     if guessTypes {

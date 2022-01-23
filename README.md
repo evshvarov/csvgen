@@ -6,6 +6,7 @@
 
 This is a simple to to import data from an arbitrary CSV to InterSystems IRIS.
 It can import from file or from public URL
+if you are on IRIS 2021.2 and newer it uses LOAD DATA function to import data
 
 ## Installation with ZPM
 ```
@@ -42,7 +43,9 @@ it will use SSL connection, with "default" SSL, but you can alter this.
 - pguessTypes - guess on field types. 1 by default. if 0 then all fields will be as VARCHAR 250
 - Output recordsCount - returns amount of imported records.
 - verbose 1 by default - outputs the results of class generation and data import.
-
+- pappend 0 by default - turn to 1 if you want to add the data in the existing table from the similar csv
+- ploaddata 1 by default - if 1 it uses LOAD DATA function to load the data from CSV. Should be faster and with less errors
+- pheader 1 by default -  if 1 it considers first line of the CSV as a header and skips it
 
 ## EXAMPLES
 ### Import Titanic data
