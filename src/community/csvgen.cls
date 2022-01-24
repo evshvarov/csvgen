@@ -76,7 +76,7 @@ ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass A
     s stream=..GetStreamFromURL(URL) 
     s sc=..StreamToFile(stream,.filename)
     if $$$ISERR(sc) Return sc
-    s sc=..Generate(filename,dlm,.pclass,.prowtype,pguessTypes,.recordsCount,pverbose,pappend) 
+    s sc=..Generate(filename,dlm,.pclass,.prowtype,pguessTypes,.recordsCount,pverbose,pappend,ploaddata,pheader) 
     
     return sc
 }
@@ -111,19 +111,19 @@ ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %St
     if $g(pappend),##class(%Dictionary.CompiledClass).%ExistsId(pclass) {
         
         if ploaddata {
-            set sc=..CSVLOADDATA(prowtype,fncsv,dlm,pclass,$g(pappend))
+            set sc=..CSVLOADDATA(prowtype,fncsv,dlm,pclass,pheader)
             set sc=..HowManyRecords(pclass,.recordsCount)
         }
         else {
             ///ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]  
-            set pRecordCount=$CLASSMETHOD(pclass,"Import",,fncsv,dlm,,1,,pappend)
+            set recordsCount=$CLASSMETHOD(pclass,"Import",,fncsv,dlm,,1,,pappend)
             }
         }
     else {
 
         if $g(prowtype)="" set prowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
         if $g(ploaddata) {
-            set sc=..CSVLOADDATA(prowtype,fncsv,dlm,pclass,$g(pappend),$g(pheader))}
+            set sc=..CSVLOADDATA(prowtype,fncsv,dlm,pclass,pheader)}
         else {
             do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv, dlm, ,1, pclass)
             // change the generated method to add the Append support
@@ -157,7 +157,7 @@ ClassMethod RandomClassName(fncsv) As %String
 }
 
 /// CSVLOADDATA - generates and imports data into the class
-ClassMethod CSVLOADDATA(prowtype, fncsv, dlm, pclass, pappend, pheader) As %Status
+ClassMethod CSVLOADDATA(prowtype, fncsv, dlm, pclass, pheader) As %Status
 {
     Set sc = $$$OK
     set tablename=$TR($P(pclass,".",1,*-1),".","_")_"."_$p(pclass,".",*)
