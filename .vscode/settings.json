@@ -12,7 +12,10 @@
       "docker-compose": {
         "service": "iris",
         "internalPort": 52773
-      }
+      },
+    "links" :{
+      "UnitTest Portal" :"${serverUrl}/csp/sys/%25UnitTest.Portal.Home.cls?$NAMESPACE=IRISAPP"
+    }
     }
     
   

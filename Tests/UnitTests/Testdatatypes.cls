@@ -19,6 +19,15 @@ Method TestString()
 	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
 }
 
+Method TestDateTime()
+{
+	Set tExpected=1
+    set value="12/31/2014 12:00:00 AM"
+    w ##class(community.datatypes).Guess(value,.types)
+    set tResults=$D(types("DATETIME"))
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+}
+
 Method TestDate()
 {
 	Set tExpected=1

@@ -1,18 +1,40 @@
 Class UnitTests.Testcsv Extends %UnitTest.TestCase
 {
 
-Method NoHeader()
+Method TestReservedWords()
+{
+	Set tExpected=30
+	set fn="/irisrun/repo/data/Educational_Attainment_small.csv"
+	kill pclass
+    kill prowtype
+	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults)
+	do $$$AssertStatusOK(status,"Generate")
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+}
+
+Method TestDateTime()
+{
+	Set tExpected=1010
+	set fn="/irisrun/repo/data/Educational_Attainment.csv"
+	kill pclass
+    kill prowtype
+	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults)
+	do $$$AssertStatusOK(status,"Generate")
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+}
+
+Method TestNoHeader()
 {
 	Set tExpected=10
 	set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
 	kill pclass
     kill prowtype
-	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults,,,1,0)
+	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,0,.tResults,,,1,0)
 	do $$$AssertStatusOK(status,"Generate")
 	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
 }
 
-Method NoLoadData()
+Method TestNoLoadData()
 {
 	Set tExpected=9
 	set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"

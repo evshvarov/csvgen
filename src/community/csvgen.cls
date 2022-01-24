@@ -61,11 +61,12 @@ ClassMethod Run() As %Status
     set fn="/irisrun/repo/data/countries_dspl.csv"
     set fn="/irisrun/repo/data/covid-03-16-2020.csv"
     set fn="/irisrun/repo/data/organisations.csv"
+    set fn="/irisrun/repo/data/Educational_Attainment.csv"
     //set fn="/irisrun/repo/data/game_of_thrones_deaths_collecti.csv"
     
     kill pclass 
     kill prowtype
-  	set status=##class(community.csvgen).Generate(fn,";",.pclass,.prowtype,0,.tResults)
+  	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults,,,1)
     //set status=##class(community.csvgen).Generate(fn,,.pclass,.prowtype,0,.tResults,,1)  
     return status
 }
@@ -180,6 +181,7 @@ ClassMethod CSVLOADDATA(prowtype, fncsv, dlm, pclass, pappend, pheader) As %Stat
     set sc = tStatement.%Prepare(importsql)
     if sc'=1 return sc
     SET rset = tStatement.%Execute()
+    If %sqlcontext.%SQLCODE && (%sqlcontext.%SQLCODE '= 100) Quit $$$ERROR($$$SQLCode, %sqlcontext.%SQLCODE, %sqlcontext.%Message)
 
     Return sc
 }
@@ -225,6 +227,16 @@ ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",", guessTypes As %B
     set rowtypes=$TR(rowtypes,dlm,",")
     // change "." symbol in column names
     set rowtypes=$TR(rowtypes,".","_")
+    // check on reserved words
+    for i=1:1:$L(rowtypes,",") {
+        set field=$P(rowtypes,",",i)
+        if $SYSTEM.SQL.IsReservedWord($p(field," ")) {
+            set $P(rowtypes,",",i)=$p(field," ")_"Field "_$p(field," ",2)
+            //todo check on field duplicate after changing the name
+            //set $P(rowtypes,",",i)=""""_$p(field," ")_""" "_$p(field," ",2)
+            }
+    }
+
     Return rowtypes
 }
 

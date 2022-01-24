@@ -28,6 +28,10 @@ ClassMethod Guess(value As %String, ByRef types) As %Status
        if ($L(value,".")=1) if $I(types("INTEGER"))
    quit $$$OK
    }
+   if ..IsDateTime(value) {
+       if $I(types("DATETIME")) 
+       Quit $$$OK 
+   }
    if ..IsDate(value) {
        if $I(types("DATE")) 
        Quit $$$OK 
@@ -35,6 +39,23 @@ ClassMethod Guess(value As %String, ByRef types) As %Status
    if $I(types("VARCHAR"))
 
    return $$$OK
+}
+
+/// DateTime test
+ClassMethod IsDateTime(pVar As %String = "") As %Boolean
+{
+    Set result = $$$YES
+
+    Try {
+        If $ZDateTimeH(pVar,5)
+    }
+    Catch e {
+        set result=$$$NO
+    }
+    // check if the value has at least date and time parts separated by space
+    if $L(pVar," ")<2 set result =$$$NO
+
+    Quit result
 }
 
 ClassMethod IsDate(pVar As %String = "") As %Boolean
