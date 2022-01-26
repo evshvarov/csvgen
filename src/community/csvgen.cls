@@ -218,7 +218,7 @@ ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",", guessTypes As %B
             set type=##class(datatypes).Decide(.types) 
             //if type="DATE" set type ="VARCHAR"
             if type="VARCHAR" set type="VARCHAR(250)"
-            set $Piece(rowtypes,dlm,i)=$TR($Piece(header,dlm,i)," ","")_" "_type
+            set $Piece(rowtypes,dlm,i)=$TR($Piece(header,dlm,i),"/ ","")_" "_type
 
         }
         
