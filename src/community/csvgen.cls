@@ -112,19 +112,20 @@ ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %St
         
         if ploaddata {
             set sc=..CSVLOADDATA(prowtype,fncsv,dlm,pclass,pheader)
+            if $$$ISERR(sc) quit sc
             set sc=..HowManyRecords(pclass,.recordsCount)
-        }
-        else {
+            if $$$ISERR(sc) quit sc
+        } else {
             ///ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]  
             set recordsCount=$CLASSMETHOD(pclass,"Import",,fncsv,dlm,,1,,pappend)
-            }
         }
-    else {
+    } else {
 
         if $g(prowtype)="" set prowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
         if $g(ploaddata) {
-            set sc=..CSVLOADDATA(prowtype,fncsv,dlm,pclass,pheader)}
-        else {
+            set sc=..CSVLOADDATA(prowtype,fncsv,dlm,pclass,pheader)
+            if $$$ISERR(sc) quit sc
+        } else {
             do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv, dlm, ,1, pclass)
             // change the generated method to add the Append support
             set sc=..AddAppendtoImport(pclass)
@@ -164,13 +165,13 @@ ClassMethod CSVLOADDATA(prowtype, fncsv, dlm, pclass, pheader) As %Status
 
 
     If '##class(%Dictionary.ClassDefinition).%ExistsId(pclass) {
-
-    set sql="CREATE TABLE "_tablename_"("_prowtype_")"
-    set tStatement = ##class(%SQL.Statement).%New()
-    set sc = tStatement.%Prepare(sql)
-    if sc'=1 return sc
-    SET rset = tStatement.%Execute()
+        set sql="CREATE TABLE "_tablename_"("_prowtype_")"
+        set tStatement = ##class(%SQL.Statement).%New()
+        set sc = tStatement.%Prepare(sql)
+        if sc'=1 return sc
+        SET rset = tStatement.%Execute()
     }
+    
     //if 'pappend do $CLASSMETHOD(pclass,"%DeleteExtent")
     set importsql="LOAD DATA FROM FILE '"_fncsv_"'"
     set importsql=importsql_" COLUMNS("_prowtype_") INTO "_tablename
