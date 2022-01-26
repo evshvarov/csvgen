@@ -231,9 +231,9 @@ ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",", guessTypes As %B
     for i=1:1:$L(rowtypes,",") {
         set field=$P(rowtypes,",",i)
         if $SYSTEM.SQL.IsReservedWord($p(field," ")) {
-            set $P(rowtypes,",",i)=$p(field," ")_"Field "_$p(field," ",2)
+            //set $P(rowtypes,",",i)=$p(field," ")_"Field "_$p(field," ",2)
             //todo check on field duplicate after changing the name
-            //set $P(rowtypes,",",i)=""""_$p(field," ")_""" "_$p(field," ",2)
+            set $P(rowtypes,",",i)=""""_$p(field," ")_""" "_$p(field," ",2)
             }
     }
 
