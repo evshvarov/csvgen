@@ -66,7 +66,7 @@ ClassMethod Run() As %Status
     
     kill pclass 
     kill prowtype
-  	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults,,,1)
+  	set status=##class(community.csvgen).Generate(fn,",","csvgen.runtest",.prowtype,1,.tResults,,,1)
     //set status=##class(community.csvgen).Generate(fn,,.pclass,.prowtype,0,.tResults,,1)  
     return status
 }
@@ -276,8 +276,13 @@ ClassMethod StreamToFile(stream As %Stream, ByRef filename As %String) As %Statu
 /// URL=example.com/data/document.csv
 ClassMethod GetStreamFromURL(URL As %String, SSLConf As %String = "default") As %CharacterStream
 {
+    set ns=$znspace
+    zn "%SYS"
+
     //set SSLConfig="GitHub"   
-    //do:'##class(Security.SSLConfigs).Exists(SSLConfig) ##class(Security.SSLConfigs).Create(SSLConfig)
+    do:'##class(Security.SSLConfigs).Exists(SSLConf) ##class(Security.SSLConfigs).Create(SSLConf)
+    zn ns
+
     if $L(URL,"http")>1 set URL=$P(URL,"//",2)
     Set httprequest = ##class(%Net.HttpRequest).%New()
     Set httprequest.Server = $P(URL,"/")

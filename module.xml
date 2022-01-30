@@ -3,15 +3,9 @@
   <Document name="csvgen.ZPM">
     <Module>
       <Name>csvgen</Name>
-      <Version>1.3.1</Version>
+      <Version>1.4.0</Version>
       <Description>Module to generate and import csv data using InterSystems ObjectScript</Description>
       <Packaging>module</Packaging>
-      <Dependencies>
-        <ModuleReference>
-          <Name>sslclient</Name>
-          <Version>1.*</Version>
-        </ModuleReference>
-      </Dependencies>
       <SourcesRoot>src</SourcesRoot>
       <Resource Name="community.PKG"/>
       <UnitTest Name="/Tests" Package="UnitTests" Phase="test"/>

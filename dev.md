@@ -1,7 +1,7 @@
 # useful commands
 ## build container with no cache
 ```
-docker-compose build --no-cache
+docker-compose build --no-cache --progress=plain
 ```
 ## open terminal to docker
 ```
@@ -15,3 +15,5 @@ set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
 	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults)
 	
 
+w ##class(community.csvgen).Run()
+ ##class(community.csvgen).RunURL()
