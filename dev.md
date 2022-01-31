@@ -19,5 +19,5 @@ w ##class(community.csvgen).Run()
  ##class(community.csvgen).RunURL()
 
  
- w $System.Status.GetErrorText(##class(community.csvgen).ToCSV(";",1,"/irisrun/repo/data/test","select * from csvgen.runtest"))
+ w $System.Status.GetErrorText(##class(community.csvgen).SQLToCSV(";",1,"/irisrun/repo/data/test","select * from csvgen.runtest"))
 

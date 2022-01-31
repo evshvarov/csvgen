@@ -56,7 +56,7 @@ you can export the results of an arbitrary SQL query to a class name.
 ```
 USER>set query="select * from your.classname"
 
-USER>w ##class(community.csvgen).ToCSV(";",1,"/folder/file.csv",query)
+USER>w ##class(community.csvgen).SQLToCSV(";",1,"/folder/file.csv",query)
 1
 ```
 this will export all the data from your.classname to /file.csv with ";" as a delimeter. And it will overwrite file.csv if it exists.
