@@ -17,3 +17,7 @@ set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
 
 w ##class(community.csvgen).Run()
  ##class(community.csvgen).RunURL()
+
+ 
+ w $System.Status.GetErrorText(##class(community.csvgen).ToCSV(";",1,"/irisrun/repo/data/test","select * from csvgen.runtest"))
+

@@ -4,9 +4,11 @@
  [![Quality Gate Status](https://community.objectscriptquality.com/api/project_badges/measure?project=intersystems_iris_community%2Fcsvgen&metric=alert_status)](https://community.objectscriptquality.com/dashboard?id=intersystems_iris_community%2Fcsvgen)
  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/evshvarov/csvgen">
 
-This is a simple to to import data from an arbitrary CSV to InterSystems IRIS.
-It can import from file or from public URL
+This is a simple module that allows to import data from an arbitrary CSV to InterSystems IRIS.
+It can import from file or from public URL, creates the class and imports data
 if you are on IRIS 2021.2 and newer it uses LOAD DATA function to import data
+
+Also it can export data from an arbitrary SQL to CSV.
 
 ## Installation with ZPM
 ```
@@ -46,6 +48,18 @@ it will use SSL connection, with "default" SSL, but you can alter this.
 - pappend 0 by default - turn to 1 if you want to add the data in the existing table from the similar csv
 - ploaddata 1 by default - if 1 it uses LOAD DATA function to load the data from CSV. Should be faster and with less errors
 - pheader 1 by default -  if 1 it considers first line of the CSV as a header and skips it
+
+
+### Exporting SQL query result to CSV
+
+you can export the results of an arbitrary SQL query to a class name.
+```
+USER>set query="select * from your.classname"
+
+USER>w ##class(community.csvgen).ToCSV(";",1,"/folder/file.csv",query)
+1
+```
+this will export all the data from your.classname to /file.csv with ";" as a delimeter. And it will overwrite file.csv if it exists.
 
 ## EXAMPLES
 ### Import Titanic data

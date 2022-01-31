@@ -56,17 +56,18 @@ ClassMethod RunURL() As %Status
 
 ClassMethod Run() As %Status
 {
-    set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
+    
     set fn="/irisrun/repo/data/game_of_thrones_deaths_collecti_with_bad.csv"
     set fn="/irisrun/repo/data/countries_dspl.csv"
     set fn="/irisrun/repo/data/covid-03-16-2020.csv"
-    set fn="/irisrun/repo/data/organisations.csv"
     set fn="/irisrun/repo/data/Educational_Attainment.csv"
+    set fn="/irisrun/repo/data/organisations.csv"
+    set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
     //set fn="/irisrun/repo/data/game_of_thrones_deaths_collecti.csv"
     
     kill pclass 
     kill prowtype
-  	set status=##class(community.csvgen).Generate(fn,",","csvgen.runtest",.prowtype,1,.tResults,,,1)
+  	set status=##class(community.csvgen).Generate(fn,",","csvgen.runtest",.prowtype,0,,.tResults,,,1)
     //set status=##class(community.csvgen).Generate(fn,,.pclass,.prowtype,0,.tResults,,1)  
     return status
 }
@@ -297,6 +298,37 @@ ClassMethod GetStreamFromURL(URL As %String, SSLConf As %String = "default") As 
 
     //TBD check for sc
     return stream
+}
+
+/// w $System.Status.GetErrorText(##class(community.csvgen).ToCSV())
+/// Write SQL query into CSV file
+/// dlm - delimeter
+/// overwrite - 1 if you want to delete file, if it exists
+/// file - filename, e.g. test.csv
+/// query - sql query
+/// args - sql query args
+ClassMethod SQLToCSV(dlm As %String = ",", overwrite As %Boolean = 0, file = {##class(%File).NormalizeDirectory(##class(%SYS.System).TempDirectory())_ "out.csv"}, query As %String = "SELECT 1,2,'a'", args...) As %Status
+{
+    #dim sc As %Status = $$$OK
+    // remove .csv from filename as the export method adds it anyway
+    set:$l(file,".csv")>1 file = $p(file,".csv")
+    set dir = ##class(%File).GetDirectory(file)
+    set exists = ##class(%File).DirectoryExists(dir)
+    if (exists=$$$NO) {
+        set success = ##class(%File).CreateDirectoryChain(dir, .code)
+        set:success=$$$NO sc = $$$ERROR($$$GeneralError, "Unable to create directory: '" _ dir _ "', reason: " _ code)
+    }
+    quit:$$$ISERR(sc) sc
+    if 'overwrite,##class(%File).Exists(file) set sc=$$$ERROR($$$GeneralError,"File "_file_" exists")
+
+    #dim rs As %SQL.StatementResult
+    set rs = ##class(%SQL.Statement).%ExecDirect(,query, args...)
+    if rs.%SQLCODE=0 {
+       do rs.%DisplayFormatted("CSV", file,,,,dlm)
+    } else {
+        set sc = $$$ERROR($$$SQLError, rs.%SQLCODE, rs.%Message)
+    }
+    quit sc
 }
 
 }

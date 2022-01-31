@@ -1,6 +1,22 @@
 Class UnitTests.Testcsv Extends %UnitTest.TestCase
 {
 
+Method TestSQLtoCSV()
+{
+	Set tExpected=9
+	set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
+	set pclass="community.csvgen.sqltest"
+    kill prowtype
+	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults)
+	do $$$AssertStatusOK(status,"Generate")
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+	
+	set fn="/irisrun/repo/data/test.csv"
+	set query="SELECT * FROM community_csvgen.sqltest"
+	set status=##class(community.csvgen).SQLToCSV(";",1,fn,query)
+	do $$$AssertStatusOK(status,"SQLToCSV")
+}
+
 Method TestReservedWords()
 {
 	Set tExpected=30
