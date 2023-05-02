@@ -1,11 +1,11 @@
 {
     "files.associations": {
-    
+
         "Dockerfile*": "dockerfile",
         "iris.script": "objectscript"
       },
     "objectscript.conn" :{
-      "ns": "IRISAPP",
+      "ns": "USER",
       "username": "_SYSTEM",
       "password": "SYS",
       "active": true,
@@ -13,11 +13,11 @@
         "service": "iris",
         "internalPort": 52773
       },
-    "links" :{
-      "UnitTest Portal" :"${serverUrl}/csp/sys/%25UnitTest.Portal.Home.cls?$NAMESPACE=IRISAPP"
+      "links": {
+        "UnitTest Portal": "${serverUrl}/csp/sys/%25UnitTest.Portal.Home.cls?$NAMESPACE=IRISAPP"
+      }
     }
-    }
-    
-  
+
+
 
 }

@@ -3,13 +3,13 @@
   <Document name="csvgen.ZPM">
     <Module>
       <Name>csvgen</Name>
-      <Version>1.4.1</Version>
+      <Version>1.5.0</Version>
       <Description>Module to generate import and export csv data using InterSystems ObjectScript</Description>
       <Packaging>module</Packaging>
       <SourcesRoot>src</SourcesRoot>
       <Resource Name="community.PKG"/>
-      <UnitTest Name="/Tests" Package="UnitTests" Phase="test"/>
+      <UnitTest Name="/tests" Package="community.csvgen.UnitTests" Phase="test"/>
     </Module>
-    
+
   </Document>
 </Export>

@@ -1,4 +1,4 @@
-Class community.datatypes
+Class community.csvgen.datatypes
 {
 
 ClassMethod Decide(ByRef types) As %String
@@ -7,7 +7,7 @@ ClassMethod Decide(ByRef types) As %String
         if types("MONEY")=types("DOUBLE") return "MONEY"
     }
     set i=$Order(types(""))
-    while i'="" { 
+    while i'="" {
         set typesI(types(i))=i
         set i=$Order(types(i))
     }
@@ -29,12 +29,12 @@ ClassMethod Guess(value As %String, ByRef types) As %Status
    quit $$$OK
    }
    if ..IsDateTime(value) {
-       if $I(types("DATETIME")) 
-       Quit $$$OK 
+       if $I(types("DATETIME"))
+       Quit $$$OK
    }
    if ..IsDate(value) {
-       if $I(types("DATE")) 
-       Quit $$$OK 
+       if $I(types("DATE"))
+       Quit $$$OK
    }
    if $I(types("VARCHAR"))
 

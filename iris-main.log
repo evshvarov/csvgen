@@ -1,0 +1,63 @@
+14:38:25 2023-05-02 [INFO] Starting InterSystems IRIS instance IRIS...
+14:38:27 2023-05-02 [INFO] Starting Control Process
+Global buffer setting requires attention.  Auto-selected 25% of total memory.
+Allocated 2674MB shared memory
+1962MB global buffers, 196MB routine buffers
+This copy of InterSystems IRIS has been licensed for use exclusively by:
+InterSystems IRIS Community
+Copyright (c) 1986-2023 by InterSystems Corporation
+Any other use is a violation of your license agreement
+
+1 alert(s) during startup. See messages.log for details.
+Starting IRIS
+
+
+14:38:27 2023-05-02 [INFO] ...started InterSystems IRIS instance IRIS
+14:38:27 2023-05-02 [INFO] Executing command /docker-entrypoint.sh iris-after-start ...
+14:38:28 2023-05-02 [INFO] 
+/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+
+
+14:38:28 2023-05-02 [INFO] ...executed command /docker-entrypoint.sh iris-after-start 
+14:41:05 2023-05-02 [INFO] Starting InterSystems IRIS instance IRIS...
+14:41:07 2023-05-02 [INFO] Starting Control Process
+Global buffer setting requires attention.  Auto-selected 25% of total memory.
+Allocated 2674MB shared memory
+1962MB global buffers, 196MB routine buffers
+This copy of InterSystems IRIS has been licensed for use exclusively by:
+InterSystems IRIS Community
+Copyright (c) 1986-2023 by InterSystems Corporation
+Any other use is a violation of your license agreement
+
+1 alert(s) during startup. See messages.log for details.
+Starting IRIS
+
+
+14:41:07 2023-05-02 [INFO] ...started InterSystems IRIS instance IRIS
+14:41:07 2023-05-02 [INFO] Executing command /docker-entrypoint.sh iris-after-start ...
+14:41:07 2023-05-02 [INFO] 
+/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+
+
+14:41:07 2023-05-02 [INFO] ...executed command /docker-entrypoint.sh iris-after-start 
+14:41:32 2023-05-02 [INFO] Starting InterSystems IRIS instance IRIS...
+14:41:34 2023-05-02 [INFO] Starting Control Process
+Global buffer setting requires attention.  Auto-selected 25% of total memory.
+Allocated 2674MB shared memory
+1962MB global buffers, 196MB routine buffers
+This copy of InterSystems IRIS has been licensed for use exclusively by:
+InterSystems IRIS Community
+Copyright (c) 1986-2023 by InterSystems Corporation
+Any other use is a violation of your license agreement
+
+1 alert(s) during startup. See messages.log for details.
+Starting IRIS
+
+
+14:41:34 2023-05-02 [INFO] ...started InterSystems IRIS instance IRIS
+14:41:34 2023-05-02 [INFO] Executing command /docker-entrypoint.sh iris-after-start ...
+14:41:34 2023-05-02 [INFO] 
+/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+
+
+14:41:34 2023-05-02 [INFO] ...executed command /docker-entrypoint.sh iris-after-start 

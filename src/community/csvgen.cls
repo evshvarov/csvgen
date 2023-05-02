@@ -21,7 +21,7 @@ ClassMethod HowManyRecords(pclass As %String, ByRef recordsCount As %Integer) As
 /// adds pAppend parameter to a generated Import method of a pClassName and the logic around
 ClassMethod AddAppendtoImport(pClassName As %String) As %Status
 {
- 
+
     set method = ##class(%Dictionary.MethodDefinition).%OpenId(pClassName_"||Import")
 
     if method.FormalSpec["pAppend" quit $$$OK
@@ -30,14 +30,14 @@ ClassMethod AddAppendtoImport(pClassName As %String) As %Status
     set newImp=##class(%Stream.TmpCharacter).%New()
 
     while 'imp.AtEnd {
-        set line=imp.ReadLine() 
+        set line=imp.ReadLine()
         if line'["%DeleteExtent" {do newImp.WriteLine(line)}
         else {
             do newImp.WriteLine($p(line,"do")_"if 'pAppend do ..%DeleteExtent(,.tDeleted,.tInstances,1)")
         }
         }
     set method.Implementation=newImp
-    set sc=method.%Save() 
+    set sc=method.%Save()
     if $$$ISERR(sc) return sc
     set sc=$System.OBJ.Compile(pClassName,"cuk")
     return sc
@@ -56,29 +56,31 @@ ClassMethod RunURL() As %Status
 
 ClassMethod Run() As %Status
 {
-    
-    set fn="/irisrun/repo/data/game_of_thrones_deaths_collecti_with_bad.csv"
-    set fn="/irisrun/repo/data/countries_dspl.csv"
-    set fn="/irisrun/repo/data/covid-03-16-2020.csv"
-    set fn="/irisrun/repo/data/Educational_Attainment.csv"
-    set fn="/irisrun/repo/data/organisations.csv"
-    set fn="/irisrun/repo/data/10k_diabetes_small 2.csv"
-    //set fn="/irisrun/repo/data/game_of_thrones_deaths_collecti.csv"
-    
-    kill pclass 
+
+    set fn="/home/irisowner/irisdev/data/game_of_thrones_deaths_collecti_with_bad.csv"
+    set fn="/home/irisowner/irisdev/data/countries_dspl.csv"
+    set fn="/home/irisowner/irisdev/data/covid-03-16-2020.csv"
+    set fn="/home/irisowner/irisdev/data/organisations.csv"
+    set fn="/home/irisowner/irisdev/data/10k_diabetes_small 2.csv"
+    set fn="/home/irisowner/irisdev/data/Educational_Attainment.csv"
+    set fn="/home/irisowner/irisdev/data/Educational_Attainment_small.csv"
+    //set fn="/home/irisowner/irisdev/data/game_of_thrones_deaths_collecti.csv"
+
+    kill pclass
     kill prowtype
-  	set status=##class(community.csvgen).Generate(fn,",","csvgen.runtest",.prowtype,0,,.tResults,,,1)
-    //set status=##class(community.csvgen).Generate(fn,,.pclass,.prowtype,0,.tResults,,1)  
+  	//set status=##class(community.csvgen).Generate(fn,",","csvgen.runtest",.prowtype,0,,.tResults,,,1)
+    //set status=##class(community.csvgen).Generate(fn,,.pclass,.prowtype,0,.tResults,,1)
+    set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults)
     return status
 }
 
 ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, pverbose As %Boolean = 1, pappend As %Boolean = 0, ploaddata As %Boolean = 1, pheader As %Boolean = 1) As %Status
 {
-    s stream=..GetStreamFromURL(URL) 
+    s stream=..GetStreamFromURL(URL)
     s sc=..StreamToFile(stream,.filename)
     if $$$ISERR(sc) Return sc
-    s sc=..Generate(filename,dlm,.pclass,.prowtype,pguessTypes,.recordsCount,pverbose,pappend,ploaddata,pheader) 
-    
+    s sc=..Generate(filename,dlm,.pclass,.prowtype,pguessTypes,.recordsCount,pverbose,pappend,ploaddata,pheader)
+
     return sc
 }
 
@@ -90,7 +92,7 @@ ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass A
 /// recordCount - amount of records created and returned byRef
 /// pverbose=1 - 1 if you want utility to comment to terminal what is going on
 /// pappend=0 - 1 if you want to add records to already existing
-/// ploaddata=1 - use LOAD DATA if it is avaliable 
+/// ploaddata=1 - use LOAD DATA if it is avaliable
 /// pheader=1 - if equals 1 import skips the 1st row that is considered as header
 ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, pverbose As %Boolean = 1, pappend As %Boolean = 0, ploaddata As %Boolean = 1, pheader As %Boolean = 1) As %Status
 {
@@ -98,26 +100,26 @@ ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %St
         // ploaddata only available in IRIS from 2021.2 and newer
         if ($System.Version.GetNumber()<2021.2) set ploaddata=0
         }
-    
+
     set sc=$$$OK
     if $g(pclass)="" set pclass=..RandomClassName(fncsv)       //"community.csvgen.generated."_$TR($E(fncsv,1,5),":\/.","")_($zd($h,8))
     If '$System.OBJ.IsValidClassname(pclass) {
-        Quit $$$ERROR($$$GeneralError, "ClassName is not valid") 
+        Quit $$$ERROR($$$GeneralError, "ClassName is not valid")
         }
     if '$g(pappend),##class(%Dictionary.CompiledClass).%ExistsId(pclass){
         do $CLASSMETHOD(pclass,"%DeleteExtent")
-        
-    } 
+
+    }
 
     if $g(pappend),##class(%Dictionary.CompiledClass).%ExistsId(pclass) {
-        
+
         if ploaddata {
             set sc=..CSVLOADDATA(prowtype,fncsv,dlm,pclass,pheader)
             if $$$ISERR(sc) quit sc
             set sc=..HowManyRecords(pclass,.recordsCount)
             if $$$ISERR(sc) quit sc
         } else {
-            ///ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]  
+            ///ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]
             set recordsCount=$CLASSMETHOD(pclass,"Import",,fncsv,dlm,,1,,pappend)
         }
     } else {
@@ -142,7 +144,7 @@ ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %St
         Write "Header: "_prowtype,!
         Write "Records imported: "_recordsCount
     }
-    
+
     //ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]
     //if importData d $ClassMethod(pclass,"Import",1,fncsv,dlm,,1,.recordCount)
     q sc
@@ -172,7 +174,7 @@ ClassMethod CSVLOADDATA(prowtype, fncsv, dlm, pclass, pheader) As %Status
         if sc'=1 return sc
         SET rset = tStatement.%Execute()
     }
-    
+
     //if 'pappend do $CLASSMETHOD(pclass,"%DeleteExtent")
     set importsql="LOAD DATA FROM FILE '"_fncsv_"'"
     set importsql=importsql_" COLUMNS("_prowtype_") INTO "_tablename
@@ -210,19 +212,19 @@ ClassMethod GetRowTypes(fncsv As %String, dlm As %String = ",", guessTypes As %B
             set line(r)=stream.ReadLine()
             set line(r)=..RemoveDlm(line(r),dlm)
         }
-        
+
         for i=1:1:($Length(header,dlm)) {
             kill types
             for r=1:1:deep {
-                do ##class(datatypes).Guess($Piece(line(r),dlm,i),.types)
+                do ##class(community.csvgen.datatypes).Guess($Piece(line(r),dlm,i),.types)
                 }
-            set type=##class(datatypes).Decide(.types) 
+            set type=##class(community.csvgen.datatypes).Decide(.types)
             //if type="DATE" set type ="VARCHAR"
             if type="VARCHAR" set type="VARCHAR(250)"
             set $Piece(rowtypes,dlm,i)=$TR($Piece(header,dlm,i),"/ ","")_" "_type
 
         }
-        
+
 
     }
 
@@ -266,7 +268,7 @@ ClassMethod GetStreamFromFile(fn As %String) As %Stream
 
 ClassMethod StreamToFile(stream As %Stream, ByRef filename As %String) As %Status
 {
-    if $G(filename)="" set filename=##class(%File).NormalizeDirectory(##class(%SYS.System).TempDirectory())_"stream"_($zd($h,8)) 
+    if $G(filename)="" set filename=##class(%File).NormalizeDirectory(##class(%SYS.System).TempDirectory())_"stream"_($zd($h,8))
     Set file=##class(%Stream.FileCharacter).%New()
     Do file.LinkToFile(filename)
     Set sc=file.CopyFromAndSave(stream)
@@ -280,7 +282,7 @@ ClassMethod GetStreamFromURL(URL As %String, SSLConf As %String = "default") As 
     set ns=$znspace
     zn "%SYS"
 
-    //set SSLConfig="GitHub"   
+    //set SSLConfig="GitHub"
     do:'##class(Security.SSLConfigs).Exists(SSLConf) ##class(Security.SSLConfigs).Create(SSLConf)
     zn ns
 
@@ -292,7 +294,7 @@ ClassMethod GetStreamFromURL(URL As %String, SSLConf As %String = "default") As 
     set filename="/"_$P(URL,"/",2,*)
     $$$TOE(sc,httprequest.Get(filename))
     Set stream = httprequest.HttpResponse.Data
-    
+
     //Reset the HTTP connection, to allow for another connection and not throw a 404 error
     Do httprequest.Reset()
 
