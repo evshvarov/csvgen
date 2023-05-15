@@ -291,6 +291,12 @@ ClassMethod GetStreamFromURL(URL As %String, SSLConf As %String = "default") As 
     Set httprequest.Server = $P(URL,"/")
     Set httprequest.Https = 1
     Set httprequest.SSLConfiguration = SSLConf
+    set proxy=$System.Util.GetEnviron("https_proxy")
+    if proxy'="" {
+      Do ##class(%Net.URLParser).Parse(proxy,.pr)
+      set:$G(pr("host"))'="" httprequest.ProxyHTTPS=1,httprequest.ProxyTunnel=1,httprequest.ProxyPort=pr("port"),httprequest.ProxyServer=pr("host")
+      set:$G(pr("username"))'=""&&($G(pr("password"))'="") httprequest.ProxyAuthorization="Basic "_$system.Encryption.Base64Encode(pr("username")_":"_pr("password"))
+    }
     set filename="/"_$P(URL,"/",2,*)
     $$$TOE(sc,httprequest.Get(filename))
     Set stream = httprequest.HttpResponse.Data
