@@ -90,7 +90,6 @@ USER>d ##class(community.csvgen).GenerateFromURL("https://raw.githubusercontent.
 Class name: Data.Countries
 Header: code VARCHAR(250),name VARCHAR(250),continent VARCHAR(250),region VARCHAR(250),surface_area INTEGER,independence_year INTEGER,population INTEGER,life_expectancy MONEY,gnp DOUBLE,gnp_old INTEGER,local_name VARCHAR(250),government_form VARCHAR(250),head_of_state VARCHAR(250),capital INTEGER,code2 VARCHAR(250)
 Records imported: 167
-USER>d ##class(community.csvgen).GenerateFromURL("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/05-29-2020.csv",",","Data.Covid19")
 ```
 
 ## Known Issues
