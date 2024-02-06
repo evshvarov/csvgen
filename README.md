@@ -4,9 +4,9 @@
  [![Quality Gate Status](https://community.objectscriptquality.com/api/project_badges/measure?project=intersystems_iris_community%2Fcsvgen&metric=alert_status)](https://community.objectscriptquality.com/dashboard?id=intersystems_iris_community%2Fcsvgen)
  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/evshvarov/csvgen">
 
-This is a simple module that allows to import data from an arbitrary CSV to InterSystems IRIS.
-It can import from file or from public URL, creates the class and imports data
-if you are on IRIS 2021.2 and newer it uses LOAD DATA function to import data
+This is a simple module that allows you to import data from an arbitrary CSV to InterSystems IRIS.
+It can import from file or from public URL, create the class and import the data. 
+If you are on IRIS 2021.2 and newer it uses the [LOAD DATA](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=RSQL_loaddata) function to import data.
 
 Also it can export data from an arbitrary SQL to CSV.
 
