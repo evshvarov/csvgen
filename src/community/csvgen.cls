@@ -94,7 +94,8 @@ ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass A
 /// pappend=0 - 1 if you want to add records to already existing
 /// ploaddata=1 - use LOAD DATA if it is avaliable
 /// pheader=1 - if equals 1 import skips the 1st row that is considered as header
-ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, pverbose As %Boolean = 1, pappend As %Boolean = 0, ploaddata As %Boolean = 1, pheader As %Boolean = 1) As %Status
+/// pkey - if non-empty, then will consider to introduce a primary key for a column with the pkey name
+ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, pverbose As %Boolean = 1, pappend As %Boolean = 0, ploaddata As %Boolean = 1, pheader As %Boolean = 1, pkey As %String = "") As %Status
 {
     if ploaddata {
         // ploaddata only available in IRIS from 2021.2 and newer
@@ -125,16 +126,19 @@ ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %St
     } else {
 
         if $g(prowtype)="" set prowtype=..GetRowTypes(fncsv,dlm,pguessTypes)
-        if $g(ploaddata) {
-            set sc=..CSVLOADDATA(prowtype,fncsv,dlm,pclass,pheader)
-            if $$$ISERR(sc) quit sc
-        } else {
-            do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv, dlm, ,1, pclass)
-            // change the generated method to add the Append support
-            set sc=..AddAppendtoImport(pclass)
-            if $$$ISERR(sc) q sc
-            If %sqlcontext.%SQLCODE && (%sqlcontext.%SQLCODE '= 100) Quit $$$ERROR($$$SQLCode, %sqlcontext.%SQLCODE, %sqlcontext.%Message)
-        }
+        set sc=..LoadCSVData(fncsv,dlm,pclass,pheader,ploaddata,prowtype)
+        
+    }
+    // if pkey is passed, then add a primary key to the class if are not appending as it will delete data, introduce index and load data again
+    if $g(pkey)'="",'pappend {
+        do $CLASSMETHOD(pclass,"%DeleteExtent")
+        set tablename=##class(%DeepSee.Utils).%GetSQLTableName(pclass)
+        set sc= ..DropDDLIndex(tablename) // todo sqlname for a class
+        if $$$ISERR(sc) q sc
+        set sc=..AddPrimaryKey(tablename,pkey)
+        if $$$ISERR(sc) q sc
+        set sc=..LoadCSVData(fncsv,dlm,pclass,pheader,ploaddata,prowtype)
+        if $$$ISERR(sc) q sc
     }
     set sc=..HowManyRecords(pclass,.recordsCount)
     if $$$ISERR(sc) q sc
@@ -148,6 +152,64 @@ ClassMethod Generate(fncsv As %String, dlm As %String = ",", ByRef pclass As %St
     //ClassMethod Import(pSelectMode As %Library.Integer = {$zu(115,5)}, pFileName As %Library.String(MAXLEN=""), pDelimiter As %String = ",", pQuote As %String = """", pHeaders As %Integer = 0, ByRef pRecordCount As %Integer) As %Library.Integer [ SqlProc ]
     //if importData d $ClassMethod(pclass,"Import",1,fncsv,dlm,,1,.recordCount)
     q sc
+}
+
+// internal method to load CSV data into a class to avoid t
+
+ClassMethod LoadCSVData(fncsv, dlm, pclass, pheader, ploaddata, prowtype) As %Status
+{
+    if $g(ploaddata) {
+            set sc=..CSVLOADDATA(prowtype,fncsv,dlm,pclass,pheader)
+            if $$$ISERR(sc) quit sc
+        } else {
+            do ##class(%SQL.Util.Procedures).CSVTOCLASS(1, prowtype, fncsv, dlm, ,1, pclass)
+            // change the generated method to add the Append support
+            set sc=..AddAppendtoImport(pclass)
+            if $$$ISERR(sc) q sc
+            If %sqlcontext.%SQLCODE && (%sqlcontext.%SQLCODE '= 100) Quit $$$ERROR($$$SQLCode, %sqlcontext.%SQLCODE, %sqlcontext.%Message)
+        }
+        return $$$OK
+}
+
+ClassMethod DropDDLIndex(table) As %Status
+{
+    //B "L"
+    set st=$$$OK
+    set tStatement = ##class(%SQL.Statement).%New()
+    set query = "DROP INDEX IF EXISTS ""%%DDLBEIndex"" ON TABLE "_table
+    set qStatus = tStatement.%Prepare(query)
+    if qStatus '= 1 return qStatus
+    set rset=tStatement.%Execute()
+    if rset.%SQLCODE < 0 {
+        write "Error dropping index: "_rset.%SQLCODE_" "_rset.%Message
+        set ex=##class(%Exception.SQL).CreateFromSQLCODE(rset.%SQLCODE,rset.%Message)
+        return ex.AsStatus()
+    }
+    return st
+}
+
+ClassMethod AddPrimaryKey(table, column) As %Status
+{
+    // turn on DDLPKeyNotIDKey option
+    set st=$$$OK
+    do $System.SQL.Util.SetOption("DDLPKeyNotIDKey",0,.oldoption)
+    try {
+    set tStatement = ##class(%SQL.Statement).%New()
+    set query = "ALTER Table "_table_" ADD PRIMARY KEY ("_column_")"
+    $$$TOE(st,tStatement.%Prepare(query))
+    set rset=tStatement.%Execute()
+    if rset.%SQLCODE < 0 {
+        write "Error adding primary key: "_rset.%SQLCODE_" "_rset.%Message
+       set ex=##class(%Exception.SQL).CreateFromSQLCODE(rset.%SQLCODE,rset.%Message)
+        $$$ThrowStatus(ex.AsStatus)
+        }
+    }
+    catch ex {
+        set st=ex.AsStatus()
+    }
+    do $System.SQL.Util.SetOption("DDLPKeyNotIDKey",oldoption)
+     
+    return st
 }
 
 /// Random class name

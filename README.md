@@ -48,6 +48,7 @@ it will use SSL connection, with "default" SSL, but you can alter this.
 - pappend 0 by default - turn to 1 if you want to add the data in the existing table from the similar csv
 - ploaddata 1 by default - if 1 it uses LOAD DATA function to load the data from CSV. Should be faster and with less errors
 - pheader 1 by default -  if 1 it considers first line of the CSV as a header and skips it
+- pkey "" by default - if set, should mean the name of the column that csvgen will build a primary key and idkey index for, so the value of this column could be referenced as IDs from other tables and objects will be swizzled by ID.
 
 
 ### Exporting SQL query result to CSV

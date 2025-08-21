@@ -21,3 +21,4 @@ w ##class(community.csvgen).Run()
 
  w $System.Status.GetErrorText(##class(community.csvgen).SQLToCSV(";",1,"/home/irisowner/irisdev/data/test","select * from csvgen.runtest"))
 
+##class(community.csvgen).GetSQLTableName("community.csvgen.generated.home202508218")

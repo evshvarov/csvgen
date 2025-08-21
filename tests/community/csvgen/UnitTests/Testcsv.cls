@@ -17,6 +17,19 @@ Method TestSQLtoCSV()
 	do $$$AssertStatusOK(status,"SQLToCSV")
 }
 
+Method TestPrimaryKey()
+{
+	Set tExpected="AL"
+	set fn="/home/irisowner/irisdev/data/countries_dspl.csv"
+	set pclass="community.csvgen.countries"
+	kill prowtype
+	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults,,,,,"name")
+	do $$$AssertStatusOK(status,"Generate")
+	set instance=##class(community.csvgen.countries).%OpenId("Albania")
+	set tResults=instance.country
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+}
+
 Method TestReservedWords()
 {
 	Set tExpected=30
