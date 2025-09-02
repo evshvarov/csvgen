@@ -50,6 +50,25 @@ it will use SSL connection, with "default" SSL, but you can alter this.
 - pheader 1 by default -  if 1 it considers first line of the CSV as a header and skips it
 - pkey "" by default - if set, should mean the name of the column that csvgen will build a primary key and idkey index for, so the value of this column could be referenced as IDs from other tables and objects will be swizzled by ID.
 
+### Call with JSON qualifiers
+There is an alias method:
+```objectscript
+ ##class(community.csvgen).Gen(fname,dlm,.pclass,.prowtype,qualifiers,.recordCount)
+```
+Where qualifiers can be a JSON as follows:
+```JSON
+{ "verbose": 1, "guessTypes": 1, "append": 0, "LoadData": 1, "header": 1, "primaryKey": "colname" }
+```
+You can provide one parameter different from default, or all of them. 
+e.g. to append call it as follows:
+```objectscript
+set status=##class(community.csvgen).Gen(fname,,.pclass,.prowtype,{"append":1},.recordCount)
+```
+or setup qualifiers in advance, like:
+```objectscript
+set qualifiers={"verbose":1,"PrimaryKey":"name"}
+set status=##class(community.csvgen).Gen(fname,,.pclass,.prowtype,qualifiers,.recordCount)
+```
 
 ### Exporting SQL query result to CSV
 

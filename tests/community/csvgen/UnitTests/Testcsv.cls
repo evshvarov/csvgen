@@ -1,6 +1,9 @@
 Class community.csvgen.UnitTests.Testcsv Extends %UnitTest.TestCase
 {
 
+/// add test method for Gen method which tries to use JSON qualifiers
+/// 
+/// TestSQLtoCSV
 Method TestSQLtoCSV()
 {
 	Set tExpected=9
@@ -22,8 +25,26 @@ Method TestPrimaryKey()
 	Set tExpected="AL"
 	set fn="/home/irisowner/irisdev/data/countries_dspl.csv"
 	set pclass="community.csvgen.countries"
+	&sql(Drop table if exists community_csvgen.countries)
 	kill prowtype
 	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults,,,,,"name")
+	do $$$AssertStatusOK(status,"Generate")
+	set instance=##class(community.csvgen.countries).%OpenId("Albania")
+	set tResults=instance.country
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+}
+
+Method TestPrimaryKeyJSON()
+{
+	Set tExpected="AL"
+	set fn="/home/irisowner/irisdev/data/countries_dspl.csv"
+	set pclass="community.csvgen.countries"
+	&sql(Drop table if exists community_csvgen.countries)
+	Set sc = $SYSTEM.OBJ.Delete(pclass, "/deleteextent")
+	kill prowtype
+	//set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults,,,,,"name")
+	set qualifiers={"verbose":1,"primarykey":"name"}
+	set status=##class(community.csvgen).Gen(fn,",",.pclass,.prowtype,qualifiers,.tResults)
 	do $$$AssertStatusOK(status,"Generate")
 	set instance=##class(community.csvgen.countries).%OpenId("Albania")
 	set tResults=instance.country
@@ -63,6 +84,20 @@ Method TestNoHeader()
 	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
 }
 
+Method TestNoHeaderJSON()
+{
+	Set tExpected=10
+	set fn="/home/irisowner/irisdev/data/10k_diabetes_small 2.csv"
+	kill pclass
+    kill prowtype
+	//set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,0,.tResults,,,1,0)
+	set qualifiers={"verbose":1,"header":0,"guessTypes":0}
+	set status=##class(community.csvgen).Gen(fn,",",.pclass,.prowtype,qualifiers,.tResults)
+	
+	do $$$AssertStatusOK(status,"Gen")
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+}
+
 Method TestNoLoadData()
 {
 	Set tExpected=9
@@ -71,6 +106,20 @@ Method TestNoLoadData()
     kill prowtype
 	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults,,,0)
 	do $$$AssertStatusOK(status,"Generate")
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+}
+
+Method TestNoLoadDataJSON()
+{
+	Set tExpected=9
+	set fn="/home/irisowner/irisdev/data/10k_diabetes_small 2.csv"
+	kill pclass
+    kill prowtype
+	//set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults,,,0)
+	set qualifiers={"verbose":1,"loaddata":0}
+	set status=##class(community.csvgen).Gen(fn,",",.pclass,.prowtype,qualifiers,.tResults)
+	
+	do $$$AssertStatusOK(status,"Gen")
 	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
 }
 
@@ -83,6 +132,23 @@ Method TestAppend()
 	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults)
 	set status=##class(community.csvgen).Generate(fn,",",.pclass,.prowtype,1,.tResults,1,1)
 	do $$$AssertStatusOK(status,"Generate")
+	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
+}
+
+Method TestAppendJSON()
+{
+	Set tExpected=18
+	set fn="/home/irisowner/irisdev/data/10k_diabetes_small 2.csv"
+	kill pclass
+    kill prowtype
+	set qualifiers=""
+	set status=##class(community.csvgen).Gen(fn,",",.pclass,.prowtype,qualifiers,.tResults)
+	do $$$AssertStatusOK(status,"Gen")
+
+	set qualifiers={"append":1}
+	set status=##class(community.csvgen).Gen(fn,",",.pclass,.prowtype,qualifiers,.tResults)
+	
+	do $$$AssertStatusOK(status,"Gen")
 	Do $$$AssertEquals(tResults,tExpected,tExpected_" = "_tResults)
 }
 

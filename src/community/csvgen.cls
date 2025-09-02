@@ -74,13 +74,43 @@ ClassMethod Run() As %Status
     return status
 }
 
-ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, pverbose As %Boolean = 1, pappend As %Boolean = 0, ploaddata As %Boolean = 1, pheader As %Boolean = 1) As %Status
+ClassMethod FlattenQualifiers(ByRef qf, obj As %DynamicObject, prefix As %String = "") [ Internal, Private ]
+{
+    set iterator = obj.%GetIterator()
+    while iterator.%GetNext(.key, .value) {
+        set sub = $s(prefix="":$$$LOWER(key), 1:prefix_"."_$$$LOWER(key))
+        if $isobject(value) {
+            do ..FlattenQualifiers(.qf, value, sub)
+        } else {
+            set qf(sub) = value
+        }
+    }
+}
+
+/// alias method for Generate which allows parameters via JSON qualifiers
+/// /// <example>
+///  do ##class(community.csvgen).Gen("/tmp/data-dump/file.csv",,"package.class",,{ "verbose": 1, "guessTypes": 1, "append": 0, "LoadData": 1, "header": 1, "primaryKey": "colname" },.recordsCount)
+/// </example>
+ClassMethod Gen(fncsv As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, qualifiers As %String = "", Output recordsCount As %Integer)
+{
+    set qualifiers = $s(qualifiers="":{}, '$isobject(qualifiers):##class(%DynamicObject).%FromJSON(qualifiers), 1:qualifiers)
+    do ..FlattenQualifiers(.qf, qualifiers)
+    set pguesstypes = $get(qf("guesstypes"),1)
+    set pverbose = $get(qf("verbose"),1)
+    set pappend = $get(qf("append"),0)
+    set ploaddata = $get(qf("loaddata"),1)
+    set pheader = $get(qf("header"),1)
+    set pkey = $get(qf("primarykey"))
+    s sc=..Generate(fncsv,dlm,.pclass,.prowtype,pguesstypes,.recordsCount,pverbose,pappend,ploaddata,pheader,pkey)
+    return sc
+}
+
+ClassMethod GenerateFromURL(URL As %String, dlm As %String = ",", ByRef pclass As %String, ByRef prowtype As %String, pguessTypes As %Boolean = 1, Output recordsCount As %Integer, pverbose As %Boolean = 1, pappend As %Boolean = 0, ploaddata As %Boolean = 1, pheader As %Boolean = 1, pkey As %String = "") As %Status
 {
     s stream=..GetStreamFromURL(URL)
     s sc=..StreamToFile(stream,.filename)
     if $$$ISERR(sc) Return sc
-    s sc=..Generate(filename,dlm,.pclass,.prowtype,pguessTypes,.recordsCount,pverbose,pappend,ploaddata,pheader)
-
+    s sc=..Generate(filename,dlm,.pclass,.prowtype,pguessTypes,.recordsCount,pverbose,pappend,ploaddata,pheader,pkey)
     return sc
 }
 
@@ -201,7 +231,7 @@ ClassMethod AddPrimaryKey(table, column) As %Status
     if rset.%SQLCODE < 0 {
         write "Error adding primary key: "_rset.%SQLCODE_" "_rset.%Message
        set ex=##class(%Exception.SQL).CreateFromSQLCODE(rset.%SQLCODE,rset.%Message)
-        $$$ThrowStatus(ex.AsStatus)
+        $$$ThrowStatus(ex.AsStatus())
         }
     }
     catch ex {
